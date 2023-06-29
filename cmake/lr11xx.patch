@@ -1,0 +1,174 @@
+diff --git a/src/lr11xx_radio.c b/src/lr11xx_radio.c
+index e191510..d8300ce 100644
+--- a/src/lr11xx_radio.c
++++ b/src/lr11xx_radio.c
+@@ -75,8 +75,10 @@
+ #define LR11XX_RADIO_SET_CAD_PARAMS_CMD_LENGTH ( 2 + 7 )
+ #define LR11XX_RADIO_SET_PKT_TYPE_CMD_LENGTH ( 2 + 1 )
+ #define LR11XX_RADIO_SET_MODULATION_PARAMS_GFSK_CMD_LENGTH ( 2 + 10 )
++#define LR11XX_RADIO_SET_MODULATION_PARAMS_BPSK_CMD_LENGTH ( 2 + 6 )
+ #define LR11XX_RADIO_SET_MODULATION_PARAMS_LORA_CMD_LENGTH ( 2 + 4 )
+ #define LR11XX_RADIO_SET_PKT_PARAM_GFSK_CMD_LENGTH ( 2 + 9 )
++#define LR11XX_RADIO_SET_PKT_PARAM_BPSK_CMD_LENGTH ( 2 + 7 )
+ #define LR11XX_RADIO_SET_PKT_PARAM_LORA_CMD_LENGTH ( 2 + 6 )
+ #define LR11XX_RADIO_SET_TX_PARAMS_CMD_LENGTH ( 2 + 2 )
+ #define LR11XX_RADIO_SET_PKT_ADDRESS_CMD_LENGTH ( 2 + 2 )
+@@ -534,6 +536,23 @@ lr11xx_status_t lr11xx_radio_set_gfsk_mod_params( const void*
+                                                  0, 0 );
+ }
+ 
++lr11xx_status_t lr11xx_radio_set_bpsk_mod_params( const void* context,
++                                                  const lr11xx_radio_mod_params_bpsk_t* mod_params )
++{
++    const uint8_t cbuffer[LR11XX_RADIO_SET_MODULATION_PARAMS_BPSK_CMD_LENGTH] = {
++        ( uint8_t ) ( LR11XX_RADIO_SET_MODULATION_PARAM_OC >> 8 ),
++        ( uint8_t ) ( LR11XX_RADIO_SET_MODULATION_PARAM_OC >> 0 ),
++        ( uint8_t ) ( mod_params->br_in_bps >> 24 ),
++        ( uint8_t ) ( mod_params->br_in_bps >> 16 ),
++        ( uint8_t ) ( mod_params->br_in_bps >> 8 ),
++        ( uint8_t ) ( mod_params->br_in_bps >> 0 ),
++        ( uint8_t ) mod_params->pulse_shape,
++    };
++
++    return ( lr11xx_status_t ) lr11xx_hal_write( context, cbuffer, LR11XX_RADIO_SET_MODULATION_PARAMS_BPSK_CMD_LENGTH,
++                                                 0, 0 );
++}
++
+ lr11xx_status_t lr11xx_radio_set_lora_mod_params( const void*                           context,
+                                                   const lr11xx_radio_mod_params_lora_t* mod_params )
+ {
+@@ -550,6 +569,24 @@ lr11xx_status_t lr11xx_radio_set_lora_mod_params( const void*
+                                                  0, 0 );
+ }
+ 
++lr11xx_status_t lr11xx_radio_set_bpsk_pkt_params( const void* context,
++                                                   const lr11xx_radio_pkt_params_bpsk_t* pkt_params )
++{
++    const uint8_t cbuffer[LR11XX_RADIO_SET_PKT_PARAM_BPSK_CMD_LENGTH] = {
++        ( uint8_t ) ( LR11XX_RADIO_SET_PKT_PARAM_OC >> 8 ),
++        ( uint8_t ) ( LR11XX_RADIO_SET_PKT_PARAM_OC >> 0 ),
++        pkt_params->pld_len_in_bytes,
++        ( uint8_t ) ( pkt_params->ramp_up_delay >> 8 ),
++        ( uint8_t ) ( pkt_params->ramp_up_delay >> 0 ),
++        ( uint8_t ) ( pkt_params->ramp_down_delay >> 8 ),
++        ( uint8_t ) ( pkt_params->ramp_down_delay >> 0 ),
++        ( uint8_t ) ( pkt_params->pld_len_in_bits >> 8 ),
++        ( uint8_t ) ( pkt_params->pld_len_in_bits >> 0 ),
++    };
++
++    return ( lr11xx_status_t ) lr11xx_hal_write( context, cbuffer, LR11XX_RADIO_SET_PKT_PARAM_BPSK_CMD_LENGTH, 0, 0 );
++}
++
+ lr11xx_status_t lr11xx_radio_set_gfsk_pkt_params( const void*                           context,
+                                                   const lr11xx_radio_pkt_params_gfsk_t* pkt_params )
+ {
+diff --git a/src/lr11xx_radio.h b/src/lr11xx_radio.h
+index bcf2b0f..e23101c 100644
+--- a/src/lr11xx_radio.h
++++ b/src/lr11xx_radio.h
+@@ -398,6 +398,21 @@ lr11xx_status_t lr11xx_radio_set_pkt_type( const void* context, const lr11xx_rad
+ lr11xx_status_t lr11xx_radio_set_gfsk_mod_params( const void*                           context,
+                                                   const lr11xx_radio_mod_params_gfsk_t* mod_params );
+ 
++/*!
++ * @brief Set the modulation parameters for BPSK packets
++ *
++ * The command @ref lr11xx_radio_set_pkt_type must be called prior this one.
++ *
++ * @param [in] context Chip implementation context
++ * @param [in] mod_params The structure of modulation configuration
++ *
++ * @returns Operation status
++ *
++ * @see lr11xx_radio_set_pkt_type
++ */
++lr11xx_status_t lr11xx_radio_set_bpsk_mod_params( const void* context,
++                                                  const lr11xx_radio_mod_params_bpsk_t* mod_params );
++
+ /*!
+  * @brief Set the modulation parameters for LoRa packets
+  *
+@@ -413,6 +428,21 @@ lr11xx_status_t lr11xx_radio_set_gfsk_mod_params( const void*
+ lr11xx_status_t lr11xx_radio_set_lora_mod_params( const void*                           context,
+                                                   const lr11xx_radio_mod_params_lora_t* mod_params );
+ 
++/*!
++ * @brief Set the packet parameters for BPSK packets
++ *
++ * The command @ref lr11xx_radio_set_pkt_type must be called prior this one.
++ *
++ * @param [in] context Chip implementation context
++ * @param [in] pkt_params The structure of packet configuration
++ *
++ * @returns Operation status
++ *
++ * @see lr11xx_radio_set_pkt_type, lr11xx_radio_set_bpsk_mod_params
++ */
++lr11xx_status_t lr11xx_radio_set_bpsk_pkt_params( const void* context,
++                                                  const lr11xx_radio_pkt_params_bpsk_t* pkt_params );
++
+ /*!
+  * @brief Set the packet parameters for GFSK packets
+  *
+diff --git a/src/lr11xx_radio_types.h b/src/lr11xx_radio_types.h
+index 6f5c58d..0478d82 100644
+--- a/src/lr11xx_radio_types.h
++++ b/src/lr11xx_radio_types.h
+@@ -296,6 +296,7 @@ typedef enum
+     LR11XX_RADIO_PKT_NONE      = 0x00,  //!< State after cold start, Wi-Fi or GNSS capture
+     LR11XX_RADIO_PKT_TYPE_GFSK = 0x01,  //!< GFSK modulation
+     LR11XX_RADIO_PKT_TYPE_LORA = 0x02,  //!< LoRa modulation
++    LR11XX_RADIO_PKT_TYPE_BPSK = 0x03, //!< BPSK modulation
+ } lr11xx_radio_pkt_type_t;
+ 
+ /*!
+@@ -376,6 +377,14 @@ typedef enum
+     LR11XX_RADIO_GFSK_PULSE_SHAPE_BT_1  = 0x0B   //!< Gaussian BT 1.0
+ } lr11xx_radio_gfsk_pulse_shape_t;
+ 
++/*!
++ * @brief Pulse shape configurations
++ */
++typedef enum
++{
++    LR11XX_RADIO_DBPSK_PULSE_SHAPE = 0x16,  //!< Double OSR / RRC / BT 0.7
++} lr11xx_radio_bpsk_pulse_shape_t;
++
+ /*!
+  * @brief Channel Activity Detection parameters
+  *
+@@ -469,6 +478,15 @@ typedef struct lr11xx_radio_mod_params_gfsk_s
+     uint32_t                        fdev_in_hz;    //!< GFSK frequency deviation [Hz]
+ } lr11xx_radio_mod_params_gfsk_t;
+ 
++/*!
++ * @brief Modulation configuration for BPSK packet
++ */
++typedef struct lr11xx_radio_mod_params_bpsk_s
++{
++    uint32_t br_in_bps;                             //!< BPSK bitrate [bit/s]
++    lr11xx_radio_bpsk_pulse_shape_t pulse_shape;    //!< BPSK pulse shape
++} lr11xx_radio_mod_params_bpsk_t;
++
+ /*!
+  * @brief Modulation configuration for LoRa packet
+  */
+@@ -495,6 +513,18 @@ typedef struct lr11xx_radio_pkt_params_gfsk_s
+     lr11xx_radio_gfsk_dc_free_t           dc_free;                //!< GFSK Whitening configuration
+ } lr11xx_radio_pkt_params_gfsk_t;
+ 
++/*!
++ * @brief Packet parameter configuration for BPSK packets
++ */
++typedef struct lr11xx_radio_pkt_params_bpsk_s
++{
++    uint8_t pld_len_in_bytes;   //!< Payload length [bytes]
++    uint16_t ramp_up_delay;     //!< Delay to fine tune ramp-up time, if non-zero
++    uint16_t ramp_down_delay;   //!< Delay to fine tune ramp-down time, if non-zero
++    uint16_t pld_len_in_bits;   //!< If non-zero, used to ramp down PA before end of a payload with lengththat is not a
++                                //!< multiple of 8
++} lr11xx_radio_pkt_params_bpsk_t;
++
+ /*!
+  * @brief Packet parameter configuration for LoRa packets
+  */
