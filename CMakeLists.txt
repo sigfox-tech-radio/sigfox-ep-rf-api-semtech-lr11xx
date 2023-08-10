@@ -41,8 +41,7 @@ if (NOT TARGET lr11xx_driver)
         GIT_PROGRESS TRUE
         GIT_SHALLOW TRUE
         GIT_REPOSITORY    https://github.com/Lora-net/SWDR001.git
-        GIT_TAG           v2.1.1
-        PATCH_COMMAND git apply ${CMAKE_CURRENT_LIST_DIR}/cmake/lr11xx.patch
+        GIT_TAG           v2.3.0
     )
 else ()
     list(APPEND CHIP_RF_HEADERS_LIST "$<BUILD_INTERFACE:$<TARGET_PROPERTY:lr11xx_driver,INTERFACE_INCLUDE_DIRECTORIES>>")

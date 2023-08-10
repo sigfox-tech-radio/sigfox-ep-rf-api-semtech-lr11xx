@@ -42,6 +42,34 @@
 #endif
 #include "manuf/rf_api.h"
 
+/*** LR11XX RF API structures ***/
+
+#ifdef ERROR_CODES
+/*!******************************************************************
+ * \enum LR11XX_RF_API_status_t
+ * \brief LR11XX RF driver error codes.
+ *******************************************************************/
+typedef enum {
+    LR11XX_RF_API_ERROR_NULL_PARAMETER = RF_API_ERROR_LAST,
+    LR11XX_RF_API_ERROR_BUFFER_SIZE,
+    LR11XX_RF_API_ERROR_CHIP_RESET,
+    LR11XX_RF_API_ERROR_CHIP_WAKEUP,
+    LR11XX_RF_API_ERROR_CHIP_SYSTEM_REG,
+    LR11XX_RF_API_ERROR_CHIP_RADIO_REG,
+    LR11XX_RF_API_ERROR_CHIP_REGMEM_REG,
+    LR11XX_RF_API_ERROR_CHIP_IRQ,
+    LR11XX_RF_API_ERROR_MODULATION,
+    LR11XX_RF_API_ERROR_STATE,
+    // Low level errors.
+    // Activate the ERROR_STACK flag and use the SIGFOX_EP_API_unstack_error() function to get more details.
+    LR11XX_RF_API_ERROR_DRIVER_MCU_API,
+    LR11XX_RF_API_ERROR_DRIVER_LR11XX_HW_API,
+    // Last index.
+    SIGFOX_RF_API_ERROR_LAST
+} LR11XX_RF_API_status_t;
+#endif
+
+/*** LR11XX RF API functions ***/
 
 #if (defined ASYNCHRONOUS) || (defined LOW_LEVEL_OPEN_CLOSE)
 /*!******************************************************************

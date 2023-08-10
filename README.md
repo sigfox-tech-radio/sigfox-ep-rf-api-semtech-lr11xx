@@ -9,6 +9,8 @@ The table below shows the version compatibility with the SIGFOX_EP_LIB version.
 |                                   **LR11XX_RF_API**                                  |                              **SIGFOX_EP_LIB**                               |
 |:----------------------------------------------------------------------------------:|:----------------------------------------------------------------------------:|
 | [v1.0](https://github.com/sigfox-tech-radio/sigfox-ep-rf-api-semtech-lr11xx/releases/tag/v1.0) | [>= v3.2](https://github.com/sigfox-tech-radio/sigfox-ep-lib/releases/tag/v3.2) |
+| [v1.1](https://github.com/sigfox-tech-radio/sigfox-ep-rf-api-semtech-lr11xx/releases/tag/v1.1) | [>= v3.2](https://github.com/sigfox-tech-radio/sigfox-ep-lib/releases/tag/v3.2) |
+
 
 **Note:** the resulting radio performances of your device strongly depends on your hardware design (schematic, PCB routing, crystal oscillator placement, good RF practices, etc...). **Sigfox certification remains mandatory** whatever the software embedded in your device (including the Sigfox End-Point library and its implementation examples).
 

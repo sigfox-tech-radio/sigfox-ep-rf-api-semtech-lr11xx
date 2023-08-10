@@ -40,56 +40,85 @@
 #include "sigfox_ep_flags.h"
 #endif
 // Sigfox EP library.
-#include "manuf/rf_api.h"
 #include "sigfox_error.h"
 #include "sigfox_types.h"
 
-void LR11XX_HW_API_open(LR11XX_HW_irq_cb_t callback) {
+LR11XX_HW_API_status_t LR11XX_HW_API_open(LR11XX_HW_irq_cb_t callback) {
     /* To be implemented by the device manufacturer */
+#ifdef ERROR_CODES
+    LR11XX_HW_API_status_t status = LR11XX_HW_API_SUCCESS;
+#endif
     // Configure all hardware pin of LR11XX chipset.
     // Configure SPI peripherial.
     // Configure interrupt pin to handle radio interrupt.
     // The callback function must be called when such event occurs.
+    RETURN();
 }
 
-void LR11XX_HW_API_close(void) {
+LR11XX_HW_API_status_t LR11XX_HW_API_close(void) {
     /* To be implemented by the device manufacturer */
+#ifdef ERROR_CODES
+    LR11XX_HW_API_status_t status = LR11XX_HW_API_SUCCESS;
+#endif
     //Release all pins and peripherial opened.
+    RETURN();
 }
 
-void LR11XX_HW_API_delayMs(unsigned short delay_ms) {
+LR11XX_HW_API_status_t LR11XX_HW_API_delayMs(unsigned short delay_ms) {
 	/* To be implemented by the device manufacturer */
-
+#ifdef ERROR_CODES
+    LR11XX_HW_API_status_t status = LR11XX_HW_API_SUCCESS;
+#endif
+    RETURN();
 }
 
-void LR11XX_HW_API_get_fem_mask(LR11XX_HW_API_FEM_t fem, sfx_u8 *rfsw_dio_mask) {
+LR11XX_HW_API_status_t LR11XX_HW_API_get_fem_mask(LR11XX_HW_API_FEM_t fem, sfx_u8 *rfsw_dio_mask) {
 	/* To be implemented by the device manufacturer */
-
+#ifdef ERROR_CODES
+    LR11XX_HW_API_status_t status = LR11XX_HW_API_SUCCESS;
+#endif
+    RETURN();
 }
 
-void LR11XX_HW_API_tx_on(void) {
+LR11XX_HW_API_status_t LR11XX_HW_API_tx_on(void) {
 	/* To be implemented by the device manufacturer */
-
+#ifdef ERROR_CODES
+    LR11XX_HW_API_status_t status = LR11XX_HW_API_SUCCESS;
+#endif
+    RETURN();
 }
 
-void LR11XX_HW_API_tx_off(void) {
+LR11XX_HW_API_status_t LR11XX_HW_API_tx_off(void) {
 	/* To be implemented by the device manufacturer */
-
+#ifdef ERROR_CODES
+    LR11XX_HW_API_status_t status = LR11XX_HW_API_SUCCESS;
+#endif
+    RETURN();
 }
 
-void LR11XX_HW_API_rx_on(void) {
+LR11XX_HW_API_status_t LR11XX_HW_API_rx_on(void) {
 	/* To be implemented by the device manufacturer */
-
+#ifdef ERROR_CODES
+    LR11XX_HW_API_status_t status = LR11XX_HW_API_SUCCESS;
+#endif
+    RETURN();
 }
 
-void LR11XX_HW_API_rx_off(void) {
+LR11XX_HW_API_status_t LR11XX_HW_API_rx_off(void) {
 	/* To be implemented by the device manufacturer */
-    
+#ifdef ERROR_CODES
+    LR11XX_HW_API_status_t status = LR11XX_HW_API_SUCCESS;
+#endif
+    RETURN();
 }
 
 #if (defined TIMER_REQUIRED) && (defined LATENCY_COMPENSATION)
 /*******************************************************************/
-void LR11XX_HW_API_get_latency(LR11XX_HW_API_latency_t latency_type, sfx_u32 *latency_ms) {
+LR11XX_HW_API_status_t LR11XX_HW_API_get_latency(LR11XX_HW_API_latency_t latency_type, sfx_u32 *latency_ms) {
     /* To be implemented by the device manufacturer */
+#ifdef ERROR_CODES
+    LR11XX_HW_API_status_t status = LR11XX_HW_API_SUCCESS;
+#endif
+    RETURN();
 }
 #endif

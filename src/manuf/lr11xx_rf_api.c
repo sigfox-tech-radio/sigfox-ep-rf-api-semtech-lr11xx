@@ -75,7 +75,9 @@ typedef struct {
     sfx_u16 backup_bit_rate_bps_patch;
 }lr1110_ctx_t;
 
-static const sfx_u8 LR11XX_RF_API_VERSION[] = "v1.0";
+#ifdef VERBOSE
+static const sfx_u8 LR11XX_RF_API_VERSION[] = "v1.1";
+#endif
 
 static lr1110_ctx_t lr1110_ctx = {
 #ifdef ASYNCHRONOUS
@@ -113,11 +115,21 @@ static void LR11XX_irq(void)
 RF_API_status_t LR11XX_RF_API_open(RF_API_config_t *config) {
 #ifdef ERROR_CODES
     RF_API_status_t status = RF_API_SUCCESS;
+    LR11XX_HW_API_status_t lr11xx_hw_api_status = LR11XX_HW_API_SUCCESS;
 #endif
 #ifdef ASYNCHRONOUS
     lr1110_ctx.callbacks.process_cb = config->process_cb;
+    lr1110_ctx.callbacks.error_cb = config->error_cb;
 #endif
+#ifdef ERROR_CODES
     LR11XX_HW_API_open(&LR11XX_irq);
+    LR11XX_HW_API_check_status(LR11XX_RF_API_ERROR_DRIVER_LR11XX_HW_API);
+#else
+    LR11XX_HW_API_open(&LR11XX_irq);
+#endif
+#ifdef ERROR_CODES
+errors:
+#endif
     RETURN();
 }
 #endif
@@ -126,18 +138,24 @@ RF_API_status_t LR11XX_RF_API_process(void)
 {
 #ifdef ERROR_CODES
     RF_API_status_t status = RF_API_SUCCESS;
+    LR11XX_HW_API_status_t lr11xx_hw_api_status = LR11XX_HW_API_SUCCESS;
 #endif
     lr11xx_system_irq_mask_t lr11xx_system_irq_mask;
     lr11xx_status_t lr11xx_status;
     if (lr1110_ctx.irq_flag != 1)
-        EXIT_ERROR(RF_API_ERROR);
+        EXIT_ERROR(LR11XX_RF_API_ERROR_STATE);
     lr1110_ctx.irq_flag = 0;
 
     lr11xx_status = lr11xx_system_get_and_clear_irq_status( SFX_NULL, &lr11xx_system_irq_mask );
     if (lr11xx_status != LR11XX_STATUS_OK)
-        EXIT_ERROR(RF_API_ERROR);
+        EXIT_ERROR(LR11XX_RF_API_ERROR_CHIP_SYSTEM_REG);
     if (lr11xx_system_irq_mask & LR11XX_SYSTEM_IRQ_TX_DONE) {
+#ifdef ERROR_CODES
+        lr11xx_hw_api_status = LR11XX_HW_API_tx_off();
+        LR11XX_HW_API_check_status(LR11XX_RF_API_ERROR_DRIVER_LR11XX_HW_API);
+#else
         LR11XX_HW_API_tx_off();
+#endif
         lr1110_ctx.tx_done_flag = 1;
 #ifdef ASYNCHRONOUS
         if (lr1110_ctx.callbacks.tx_cplt_cb != SFX_NULL)
@@ -145,7 +163,12 @@ RF_API_status_t LR11XX_RF_API_process(void)
 #endif
     }
     if (lr11xx_system_irq_mask & LR11XX_SYSTEM_IRQ_RX_DONE) {
+#ifdef ERROR_CODES
+        lr11xx_hw_api_status = LR11XX_HW_API_rx_off();
+        LR11XX_HW_API_check_status(LR11XX_RF_API_ERROR_DRIVER_LR11XX_HW_API);
+#else
         LR11XX_HW_API_rx_off();
+#endif
         lr1110_ctx.rx_done_flag = 1;
 #if (defined ASYNCHRONOUS) && (defined BIDIRECTIONAL)
         if (lr1110_ctx.callbacks.rx_data_received_cb != SFX_NULL)
@@ -157,7 +180,7 @@ RF_API_status_t LR11XX_RF_API_process(void)
 #ifdef ASYNCHRONOUS
         if (lr1110_ctx.callbacks.error_cb != SFX_NULL)
 #ifdef ERROR_CODES
-            lr1110_ctx.callbacks.error_cb(RF_API_ERROR);
+            lr1110_ctx.callbacks.error_cb(LR11XX_RF_API_ERROR_CHIP_IRQ);
 #else
             lr1110_ctx.callbacks.error_cb();
 #endif
@@ -179,8 +202,17 @@ errors:
 RF_API_status_t LR11XX_RF_API_close(void) {
 #ifdef ERROR_CODES
     RF_API_status_t status = RF_API_SUCCESS;
+    LR11XX_HW_API_status_t lr11xx_hw_api_status = LR11XX_HW_API_SUCCESS;
 #endif
+#ifdef ERROR_CODES
+    lr11xx_hw_api_status = LR11XX_HW_API_close();
+    LR11XX_HW_API_check_status(LR11XX_RF_API_ERROR_DRIVER_LR11XX_HW_API);
+#else
     LR11XX_HW_API_close();
+#endif
+#ifdef ERROR_CODES
+errors:
+#endif
     RETURN();
 }
 #endif
@@ -188,6 +220,7 @@ RF_API_status_t LR11XX_RF_API_close(void) {
 RF_API_status_t LR11XX_RF_API_wake_up(void) {
 #ifdef ERROR_CODES
     RF_API_status_t status = RF_API_SUCCESS;
+    LR11XX_HW_API_status_t lr11xx_hw_api_status = LR11XX_HW_API_SUCCESS;
 #endif
     lr11xx_status_t lr11xx_status;
     lr11xx_system_errors_t errors;
@@ -196,15 +229,42 @@ RF_API_status_t LR11XX_RF_API_wake_up(void) {
     lr11xx_status = lr11xx_system_reset(SFX_NULL);
     sfx_u8 rfsw_dio_mask;
     if ( lr11xx_status != LR11XX_STATUS_OK)
-        EXIT_ERROR(RF_API_ERROR);
+        EXIT_ERROR(LR11XX_RF_API_ERROR_CHIP_RESET);
     lr11xx_status = lr11xx_system_wakeup(SFX_NULL);
     if ( lr11xx_status != LR11XX_STATUS_OK)
-        EXIT_ERROR(RF_API_ERROR);
-
+        EXIT_ERROR(LR11XX_RF_API_ERROR_CHIP_WAKEUP);
+#ifdef ERROR_CODES
+    lr11xx_hw_api_status = LR11XX_HW_API_delayMs(150);
+    LR11XX_HW_API_check_status(LR11XX_RF_API_ERROR_DRIVER_LR11XX_HW_API);
+#else
+    LR11XX_HW_API_delayMs(100);
+#endif
     lr11xx_status = lr11xx_system_set_reg_mode( SFX_NULL, LR11XX_SYSTEM_REG_MODE_LDO );
     if ( lr11xx_status != LR11XX_STATUS_OK)
-        EXIT_ERROR(RF_API_ERROR);
-
+        EXIT_ERROR(LR11XX_RF_API_ERROR_CHIP_SYSTEM_REG);
+#ifdef ERROR_CODES
+    lr11xx_hw_api_status = LR11XX_HW_API_get_fem_mask(LR11XX_HW_API_FEM_PIN_USED, &rfsw_dio_mask);
+    LR11XX_HW_API_check_status(LR11XX_RF_API_ERROR_DRIVER_LR11XX_HW_API);
+    rf_switch_setup.enable = rfsw_dio_mask;
+    lr11xx_hw_api_status = LR11XX_HW_API_get_fem_mask(LR11XX_HW_API_FEM_STBY, &rfsw_dio_mask);
+    LR11XX_HW_API_check_status(LR11XX_RF_API_ERROR_DRIVER_LR11XX_HW_API);
+    rf_switch_setup.standby = rfsw_dio_mask;
+    lr11xx_hw_api_status = LR11XX_HW_API_get_fem_mask(LR11XX_HW_API_FEM_TX, &rfsw_dio_mask);
+    LR11XX_HW_API_check_status(LR11XX_RF_API_ERROR_DRIVER_LR11XX_HW_API);
+    rf_switch_setup.tx = rfsw_dio_mask;
+    lr11xx_hw_api_status = LR11XX_HW_API_get_fem_mask(LR11XX_HW_API_FEM_TXHP, &rfsw_dio_mask);
+    LR11XX_HW_API_check_status(LR11XX_RF_API_ERROR_DRIVER_LR11XX_HW_API);
+    rf_switch_setup.tx_hp = rfsw_dio_mask;
+    lr11xx_hw_api_status = LR11XX_HW_API_get_fem_mask(LR11XX_HW_API_FEM_RX, &rfsw_dio_mask);
+    LR11XX_HW_API_check_status(LR11XX_RF_API_ERROR_DRIVER_LR11XX_HW_API);
+    rf_switch_setup.rx = rfsw_dio_mask;
+    lr11xx_hw_api_status = LR11XX_HW_API_get_fem_mask(LR11XX_HW_API_FEM_WIFI, &rfsw_dio_mask);
+    LR11XX_HW_API_check_status(LR11XX_RF_API_ERROR_DRIVER_LR11XX_HW_API);
+    rf_switch_setup.wifi = rfsw_dio_mask;
+    lr11xx_hw_api_status = LR11XX_HW_API_get_fem_mask(LR11XX_HW_API_FEM_GNSS, &rfsw_dio_mask);
+    LR11XX_HW_API_check_status(LR11XX_RF_API_ERROR_DRIVER_LR11XX_HW_API);
+    rf_switch_setup.gnss = rfsw_dio_mask;
+#else
     LR11XX_HW_API_get_fem_mask(LR11XX_HW_API_FEM_PIN_USED, &rfsw_dio_mask);
     rf_switch_setup.enable = rfsw_dio_mask;
     LR11XX_HW_API_get_fem_mask(LR11XX_HW_API_FEM_STBY, &rfsw_dio_mask);
@@ -219,41 +279,53 @@ RF_API_status_t LR11XX_RF_API_wake_up(void) {
     rf_switch_setup.wifi = rfsw_dio_mask;
     LR11XX_HW_API_get_fem_mask(LR11XX_HW_API_FEM_GNSS, &rfsw_dio_mask);
     rf_switch_setup.gnss = rfsw_dio_mask;
-    
+#endif
     lr11xx_status = lr11xx_system_set_dio_as_rf_switch( SFX_NULL, &rf_switch_setup );
     if ( lr11xx_status != LR11XX_STATUS_OK)
-        EXIT_ERROR(RF_API_ERROR);
-    lr11xx_status = lr11xx_system_set_tcxo_mode( SFX_NULL, LR11XX_SYSTEM_TCXO_CTRL_3_0V, 10);
-    if ( lr11xx_status != LR11XX_STATUS_OK)
-        EXIT_ERROR(RF_API_ERROR);
+        EXIT_ERROR(LR11XX_RF_API_ERROR_CHIP_SYSTEM_REG);
     lr11xx_status = lr11xx_system_cfg_lfclk( SFX_NULL, LR11XX_SYSTEM_LFCLK_RC, true );
     if ( lr11xx_status != LR11XX_STATUS_OK)
-        EXIT_ERROR(RF_API_ERROR);
-    lr11xx_status = lr11xx_system_set_standby(SFX_NULL, LR11XX_SYSTEM_STANDBY_CFG_XOSC);
-    if ( lr11xx_status != LR11XX_STATUS_OK)
-        EXIT_ERROR(RF_API_ERROR);
-    LR11XX_HW_API_delayMs(300);
-    lr11xx_status = lr11xx_system_clear_errors( SFX_NULL);
-    if ( lr11xx_status != LR11XX_STATUS_OK)
-        EXIT_ERROR(RF_API_ERROR);
-    lr11xx_status = lr11xx_system_calibrate( SFX_NULL, 0x3F );
-    if ( lr11xx_status != LR11XX_STATUS_OK)
-        EXIT_ERROR(RF_API_ERROR);
-    lr11xx_status = lr11xx_system_set_dio_irq_params(SFX_NULL, LR11XX_SYSTEM_IRQ_TX_DONE | LR11XX_SYSTEM_IRQ_RX_DONE | LR11XX_SYSTEM_IRQ_ERROR, 0);
-    if ( lr11xx_status != LR11XX_STATUS_OK)
-        EXIT_ERROR(RF_API_ERROR);
-    lr11xx_status = lr11xx_system_get_errors( SFX_NULL, &errors );
-    if ( (lr11xx_status != LR11XX_STATUS_OK) || (errors != 0))
-        EXIT_ERROR(RF_API_ERROR);
+        EXIT_ERROR(LR11XX_RF_API_ERROR_CHIP_SYSTEM_REG);
     lr11xx_status = lr11xx_system_clear_errors( SFX_NULL );
     if ( lr11xx_status != LR11XX_STATUS_OK)
-        EXIT_ERROR(RF_API_ERROR);
+        EXIT_ERROR(LR11XX_RF_API_ERROR_CHIP_SYSTEM_REG);
+    lr11xx_status = lr11xx_system_set_tcxo_mode( SFX_NULL, LR11XX_SYSTEM_TCXO_CTRL_1_8V, 1);
+    if ( lr11xx_status != LR11XX_STATUS_OK)
+        EXIT_ERROR(LR11XX_RF_API_ERROR_CHIP_SYSTEM_REG);
+    lr11xx_status = lr11xx_system_calibrate( SFX_NULL, LR11XX_SYSTEM_CALIB_HF_RC_MASK |
+            LR11XX_SYSTEM_CALIB_PLL_MASK | LR11XX_SYSTEM_CALIB_PLL_MASK |
+            LR11XX_SYSTEM_CALIB_ADC_MASK | LR11XX_SYSTEM_CALIB_IMG_MASK |
+            LR11XX_SYSTEM_CALIB_PLL_TX_MASK);
+    if ( lr11xx_status != LR11XX_STATUS_OK)
+        EXIT_ERROR(LR11XX_RF_API_ERROR_CHIP_SYSTEM_REG);
+#ifdef ERROR_CODES
+    lr11xx_hw_api_status = LR11XX_HW_API_delayMs(50);
+    LR11XX_HW_API_check_status(LR11XX_RF_API_ERROR_DRIVER_LR11XX_HW_API);
+#else
+    LR11XX_HW_API_delayMs(100);
+#endif
+    //Set standby on TCXO oscillator to keep the TCXO powered in standby mode.
+    lr11xx_status = lr11xx_system_set_standby(SFX_NULL, LR11XX_SYSTEM_STANDBY_CFG_XOSC);
+    if ( lr11xx_status != LR11XX_STATUS_OK)
+        EXIT_ERROR(LR11XX_RF_API_ERROR_CHIP_SYSTEM_REG);
+#ifdef ERROR_CODES
+    lr11xx_hw_api_status = LR11XX_HW_API_delayMs(100);
+    LR11XX_HW_API_check_status(LR11XX_RF_API_ERROR_DRIVER_LR11XX_HW_API);
+#else
+    LR11XX_HW_API_delayMs(100);
+#endif
+    lr11xx_status = lr11xx_system_set_dio_irq_params(SFX_NULL, LR11XX_SYSTEM_IRQ_TX_DONE | LR11XX_SYSTEM_IRQ_RX_DONE | LR11XX_SYSTEM_IRQ_ERROR, 0);
+    if ( lr11xx_status != LR11XX_STATUS_OK)
+        EXIT_ERROR(LR11XX_RF_API_ERROR_CHIP_SYSTEM_REG);
     lr11xx_status = lr11xx_system_clear_irq_status( SFX_NULL, LR11XX_SYSTEM_IRQ_ALL_MASK );
     if ( lr11xx_status != LR11XX_STATUS_OK)
-        EXIT_ERROR(RF_API_ERROR);
+        EXIT_ERROR(LR11XX_RF_API_ERROR_CHIP_SYSTEM_REG);
     lr11xx_status = lr11xx_system_get_version(SFX_NULL, &lr11xx_system_version);
     if ( lr11xx_status != LR11XX_STATUS_OK)
-        EXIT_ERROR(RF_API_ERROR);
+        EXIT_ERROR(LR11XX_RF_API_ERROR_CHIP_SYSTEM_REG);
+    lr11xx_status = lr11xx_system_get_errors( SFX_NULL, &errors );
+    if ( (lr11xx_status != LR11XX_STATUS_OK) || (errors != 0))
+        EXIT_ERROR(LR11XX_RF_API_ERROR_CHIP_SYSTEM_REG);
     lr1110_ctx.irq_en = 1;
 errors:
     RETURN();
@@ -271,8 +343,8 @@ RF_API_status_t LR11XX_RF_API_sleep(void) {
     lr11xx_system_sleep_cfg.is_rtc_timeout= 0;
     lr11xx_status = lr11xx_system_set_sleep(SFX_NULL, lr11xx_system_sleep_cfg, 0);
     if ( lr11xx_status != LR11XX_STATUS_OK)
-        EXIT_ERROR(RF_API_ERROR);
-
+        EXIT_ERROR(LR11XX_RF_API_ERROR_CHIP_SYSTEM_REG);
+        
 errors:
     RETURN();
 }
@@ -287,26 +359,24 @@ RF_API_status_t LR11XX_RF_API_init(RF_API_radio_parameters_t *radio_parameters) 
     lr11xx_status_t lr11xx_status;
     lr11xx_status = lr11xx_radio_set_rf_freq(SFX_NULL, radio_parameters->frequency_hz);
     if ( lr11xx_status != LR11XX_STATUS_OK)
-        EXIT_ERROR(RF_API_ERROR);
+        EXIT_ERROR(LR11XX_RF_API_ERROR_CHIP_RADIO_REG);
 
     switch (radio_parameters->modulation) {
         case RF_API_MODULATION_DBPSK :
             lr11xx_status = lr11xx_radio_set_pkt_type( SFX_NULL, LR11XX_RADIO_PKT_TYPE_BPSK);
             if ( lr11xx_status != LR11XX_STATUS_OK)
-                EXIT_ERROR(RF_API_ERROR);
+                EXIT_ERROR(LR11XX_RF_API_ERROR_CHIP_RADIO_REG);
             lr11xx_radio_mod_params_bpsk.br_in_bps = radio_parameters->bit_rate_bps;
-            lr1110_ctx.backup_bit_rate_bps_patch = radio_parameters->bit_rate_bps;
             lr11xx_radio_mod_params_bpsk.pulse_shape = LR11XX_RADIO_DBPSK_PULSE_SHAPE;
             lr11xx_status = lr11xx_radio_set_bpsk_mod_params( SFX_NULL, &lr11xx_radio_mod_params_bpsk );
             if ( lr11xx_status != LR11XX_STATUS_OK)
-                EXIT_ERROR(RF_API_ERROR);
+                EXIT_ERROR(LR11XX_RF_API_ERROR_CHIP_RADIO_REG);
             break;
         case RF_API_MODULATION_GFSK :
             lr11xx_status = lr11xx_radio_set_pkt_type( SFX_NULL, LR11XX_RADIO_PKT_TYPE_GFSK);
             if ( lr11xx_status != LR11XX_STATUS_OK)
-                EXIT_ERROR(RF_API_ERROR);
+                EXIT_ERROR(LR11XX_RF_API_ERROR_CHIP_RADIO_REG);
             lr11xx_radio_mod_params_gfsk.br_in_bps = radio_parameters->bit_rate_bps;
-            lr1110_ctx.backup_bit_rate_bps_patch = radio_parameters->bit_rate_bps;
 #ifdef BIDIRECTIONAL
             lr11xx_radio_mod_params_gfsk.fdev_in_hz = radio_parameters->deviation_hz;
 #endif
@@ -314,15 +384,16 @@ RF_API_status_t LR11XX_RF_API_init(RF_API_radio_parameters_t *radio_parameters) 
             lr11xx_radio_mod_params_gfsk.bw_dsb_param = LR11XX_RADIO_GFSK_BW_4800;
             lr11xx_status = lr11xx_radio_set_gfsk_mod_params(SFX_NULL, &lr11xx_radio_mod_params_gfsk);
             if ( lr11xx_status != LR11XX_STATUS_OK)
-                EXIT_ERROR(RF_API_ERROR);
+                EXIT_ERROR(LR11XX_RF_API_ERROR_CHIP_RADIO_REG);
             break;
         case RF_API_MODULATION_NONE :
             break;
         default:
-            EXIT_ERROR(RF_API_ERROR);
+            EXIT_ERROR(LR11XX_RF_API_ERROR_MODULATION);
     }
 
     if (radio_parameters->rf_mode == RF_API_MODE_TX) {
+        lr1110_ctx.backup_bit_rate_bps_patch = radio_parameters->bit_rate_bps;
         if (radio_parameters->tx_power_dbm_eirp > 14 ) {
             lr11xx_radio_pa_cfg.pa_reg_supply = LR11XX_RADIO_PA_REG_SUPPLY_VBAT;
             lr11xx_radio_pa_cfg.pa_sel = LR11XX_RADIO_PA_SEL_HP;
@@ -336,10 +407,10 @@ RF_API_status_t LR11XX_RF_API_init(RF_API_radio_parameters_t *radio_parameters) 
 
         lr11xx_status = lr11xx_radio_set_pa_cfg(SFX_NULL,&lr11xx_radio_pa_cfg);
         if ( lr11xx_status != LR11XX_STATUS_OK)
-            EXIT_ERROR(RF_API_ERROR);
+            EXIT_ERROR(LR11XX_RF_API_ERROR_CHIP_RADIO_REG);
         lr11xx_status = lr11xx_radio_set_tx_params(SFX_NULL, radio_parameters->tx_power_dbm_eirp, LR11XX_RADIO_RAMP_208_US);
         if ( lr11xx_status != LR11XX_STATUS_OK)
-            EXIT_ERROR(RF_API_ERROR);
+            EXIT_ERROR(LR11XX_RF_API_ERROR_CHIP_RADIO_REG);
 
     }
     if (radio_parameters->rf_mode == RF_API_MODE_RX) {
@@ -352,13 +423,24 @@ errors:
 RF_API_status_t LR11XX_RF_API_de_init(void) {
 #ifdef ERROR_CODES
     RF_API_status_t status = RF_API_SUCCESS;
+    LR11XX_HW_API_status_t lr11xx_hw_api_status = LR11XX_HW_API_SUCCESS;
 #endif
     lr11xx_status_t lr11xx_status;
     lr11xx_status = lr11xx_system_set_standby(SFX_NULL, LR11XX_SYSTEM_STANDBY_CFG_XOSC);
     if ( lr11xx_status != LR11XX_STATUS_OK)
-        EXIT_ERROR(RF_API_ERROR);
+        EXIT_ERROR(LR11XX_RF_API_ERROR_CHIP_SYSTEM_REG);
+#ifdef ERROR_CODES
+    lr11xx_hw_api_status = LR11XX_HW_API_rx_off();
+    LR11XX_HW_API_check_status(LR11XX_RF_API_ERROR_DRIVER_LR11XX_HW_API);
+#else
     LR11XX_HW_API_rx_off();
+#endif
+#ifdef ERROR_CODES
+    lr11xx_hw_api_status = LR11XX_HW_API_tx_off();
+    LR11XX_HW_API_check_status(LR11XX_RF_API_ERROR_DRIVER_LR11XX_HW_API);
+#else
     LR11XX_HW_API_tx_off();
+#endif
 errors:
     RETURN();
 }
@@ -366,6 +448,7 @@ errors:
 RF_API_status_t LR11XX_RF_API_send(RF_API_tx_data_t *tx_data) {
 #ifdef ERROR_CODES
     RF_API_status_t status = RF_API_SUCCESS;
+    LR11XX_HW_API_status_t lr11xx_hw_api_status = LR11XX_HW_API_SUCCESS;
 #endif
     lr11xx_radio_pkt_params_bpsk_t lr11xx_radio_pkt_params_bpsk;
     lr11xx_status_t lr11xx_status;
@@ -394,14 +477,19 @@ RF_API_status_t LR11XX_RF_API_send(RF_API_tx_data_t *tx_data) {
 
     lr11xx_status = lr11xx_radio_set_bpsk_pkt_params(SFX_NULL, &lr11xx_radio_pkt_params_bpsk);
     if ( lr11xx_status != LR11XX_STATUS_OK)
-        EXIT_ERROR(RF_API_ERROR);
+        EXIT_ERROR(LR11XX_RF_API_ERROR_CHIP_RADIO_REG);
     lr11xx_status = lr11xx_regmem_write_buffer8(SFX_NULL, buffer, lr11xx_radio_pkt_params_bpsk.pld_len_in_bytes);
     if ( lr11xx_status != LR11XX_STATUS_OK)
-        EXIT_ERROR(RF_API_ERROR);
+        EXIT_ERROR(LR11XX_RF_API_ERROR_CHIP_REGMEM_REG);
+#ifdef ERROR_CODES
+    lr11xx_hw_api_status = LR11XX_HW_API_tx_on();
+    LR11XX_HW_API_check_status(LR11XX_RF_API_ERROR_DRIVER_LR11XX_HW_API);
+#else
     LR11XX_HW_API_tx_on();
+#endif
     lr11xx_status = lr11xx_radio_set_tx( SFX_NULL, 5000);
     if ( lr11xx_status != LR11XX_STATUS_OK)
-        EXIT_ERROR(RF_API_ERROR);
+        EXIT_ERROR(LR11XX_RF_API_ERROR_CHIP_RADIO_REG);
 #ifndef ASYNCHRONOUS
     while(lr1110_ctx.tx_done_flag != 1) {
         if (lr1110_ctx.irq_flag == 1) {
@@ -425,6 +513,7 @@ errors:
 RF_API_status_t LR11XX_RF_API_receive(RF_API_rx_data_t *rx_data) {
 #ifdef ERROR_CODES
     RF_API_status_t status = RF_API_SUCCESS;
+    LR11XX_HW_API_status_t lr11xx_hw_api_status = LR11XX_HW_API_SUCCESS;
 #ifndef ASYNCHRONOUS
     MCU_API_status_t mcu_api_status = MCU_API_SUCCESS;
 #endif
@@ -449,17 +538,22 @@ RF_API_status_t LR11XX_RF_API_receive(RF_API_rx_data_t *rx_data) {
     lr11xx_radio_pkt_params_gfsk.sync_word_len_in_bits = SIGFOX_DL_FT_SIZE_BYTES * 8;
     lr11xx_status = lr11xx_radio_set_gfsk_pkt_params(SFX_NULL, &lr11xx_radio_pkt_params_gfsk);
     if ( lr11xx_status != LR11XX_STATUS_OK)
-        EXIT_ERROR(RF_API_ERROR);
+        EXIT_ERROR(LR11XX_RF_API_ERROR_CHIP_RADIO_REG);
     lr11xx_status = lr11xx_radio_set_gfsk_sync_word(SFX_NULL, sync_world);
     if ( lr11xx_status != LR11XX_STATUS_OK)
-        EXIT_ERROR(RF_API_ERROR);
+        EXIT_ERROR(LR11XX_RF_API_ERROR_CHIP_RADIO_REG);
     lr11xx_status = lr11xx_radio_cfg_rx_boosted(SFX_NULL, 0x01);
     if ( lr11xx_status != LR11XX_STATUS_OK)
-        EXIT_ERROR(RF_API_ERROR);
+        EXIT_ERROR(LR11XX_RF_API_ERROR_CHIP_RADIO_REG);
+#ifdef ERROR_CODES
+    lr11xx_hw_api_status = LR11XX_HW_API_rx_on();
+    LR11XX_HW_API_check_status(LR11XX_RF_API_ERROR_DRIVER_LR11XX_HW_API);
+#else
     LR11XX_HW_API_rx_on();
+#endif
     lr11xx_status = lr11xx_radio_set_rx_with_timeout_in_rtc_step(SFX_NULL, 0xFFFFFF);
     if ( lr11xx_status != LR11XX_STATUS_OK)
-        EXIT_ERROR(RF_API_ERROR);
+        EXIT_ERROR(LR11XX_RF_API_ERROR_CHIP_RADIO_REG);
 #ifndef ASYNCHRONOUS
     while(1) {
         if (lr1110_ctx.irq_flag == 1) {
@@ -479,7 +573,7 @@ RF_API_status_t LR11XX_RF_API_receive(RF_API_rx_data_t *rx_data) {
         }
 #ifdef ERROR_CODES
         mcu_api_status = MCU_API_timer_status(MCU_API_TIMER_INSTANCE_T_RX, &timer_has_elapsed);
-        MCU_API_check_status(RF_API_ERROR);
+        MCU_API_check_status(LR11XX_RF_API_ERROR_DRIVER_MCU_API);
 #else
         MCU_API_timer_status(MCU_API_TIMER_INSTANCE_T_RX, &timer_has_elapsed);
 #endif
@@ -501,23 +595,31 @@ RF_API_status_t LR11XX_RF_API_get_dl_phy_content_and_rssi(sfx_u8 *dl_phy_content
     lr11xx_status_t lr11xx_status;
     lr11xx_radio_pkt_status_gfsk_t lr11xx_radio_pkt_status_gfsk;
     lr11xx_radio_rx_buffer_status_t lr11xx_radio_rx_buffer_status;
+#ifdef PARAMETERS_CHECK
+    // Check parameters.
+    if ((dl_phy_content == SFX_NULL) || (dl_rssi_dbm == SFX_NULL)) {
+        EXIT_ERROR(LR11XX_RF_API_ERROR_NULL_PARAMETER);
+    }
+    if (dl_phy_content_size > SIGFOX_DL_PHY_CONTENT_SIZE_BYTES) {
+        EXIT_ERROR(LR11XX_RF_API_ERROR_BUFFER_SIZE);
+    }
+#endif
     if (lr1110_ctx.rx_done_flag != SFX_TRUE)
-        EXIT_ERROR(RF_API_ERROR);
+        EXIT_ERROR(LR11XX_RF_API_ERROR_STATE);
     lr11xx_status = lr11xx_radio_get_gfsk_pkt_status(SFX_NULL, &lr11xx_radio_pkt_status_gfsk);
     if ( lr11xx_status != LR11XX_STATUS_OK)
-        EXIT_ERROR(RF_API_ERROR);
+        EXIT_ERROR(LR11XX_RF_API_ERROR_CHIP_RADIO_REG);
     if (lr11xx_radio_pkt_status_gfsk.is_received == 1) {
         *dl_rssi_dbm = (sfx_s16)lr11xx_radio_pkt_status_gfsk.rssi_avg_in_dbm;
         lr11xx_status = lr11xx_radio_get_rx_buffer_status(SFX_NULL, &lr11xx_radio_rx_buffer_status);
         if ( lr11xx_status != LR11XX_STATUS_OK)
-            EXIT_ERROR(RF_API_ERROR);
+            EXIT_ERROR(LR11XX_RF_API_ERROR_CHIP_RADIO_REG);
         lr11xx_regmem_read_buffer8(SFX_NULL, dl_phy_content, lr11xx_radio_rx_buffer_status.buffer_start_pointer,
                 dl_phy_content_size);
         lr11xx_status = lr11xx_regmem_clear_rxbuffer(SFX_NULL);
         if ( lr11xx_status != LR11XX_STATUS_OK)
-            EXIT_ERROR(RF_API_ERROR);
+            EXIT_ERROR(LR11XX_RF_API_ERROR_CHIP_REGMEM_REG);
     }
-
 errors:
     RETURN();
 }
@@ -537,15 +639,26 @@ RF_API_status_t LR11XX_RF_API_carrier_sense(RF_API_carrier_sense_parameters_t *c
 RF_API_status_t LR11XX_RF_API_get_latency(RF_API_latency_t latency_type, sfx_u32 *latency_ms) {
 #ifdef ERROR_CODES
     RF_API_status_t status = RF_API_SUCCESS;
+    LR11XX_HW_API_status_t lr11xx_hw_api_status = LR11XX_HW_API_SUCCESS;
 #endif
     sfx_u32 latency_tmp;
 
     switch(latency_type) {
         case RF_API_LATENCY_WAKE_UP :
             *latency_ms = 532;
+#ifdef ERROR_CODES
+            lr11xx_hw_api_status = LR11XX_HW_API_get_latency(LR11XX_HW_API_LATENCY_RESET, &latency_tmp);
+            LR11XX_HW_API_check_status(LR11XX_RF_API_ERROR_DRIVER_LR11XX_HW_API);
+#else
             LR11XX_HW_API_get_latency(LR11XX_HW_API_LATENCY_RESET, &latency_tmp);
+#endif
             (*latency_ms) += latency_tmp;
-            LR11XX_HW_API_get_latency(LR11XX_HW_API_LATENCY_WAKEUP, &latency_tmp);
+#ifdef ERROR_CODES
+            lr11xx_hw_api_status = LR11XX_HW_API_get_latency(LR11XX_HW_API_LATENCY_WAKEUP, &latency_tmp);
+            LR11XX_HW_API_check_status(LR11XX_RF_API_ERROR_DRIVER_LR11XX_HW_API);
+#else
+            LR11XX_HW_API_get_latency(LR11XX_HW_API_LATENCY_RESET, &latency_tmp);
+#endif
             (*latency_ms) += latency_tmp;
             break;
         case RF_API_LATENCY_INIT_TX:
@@ -571,7 +684,7 @@ RF_API_status_t LR11XX_RF_API_get_latency(RF_API_latency_t latency_type, sfx_u32
             *latency_ms = 0;
             break;
         case RF_API_LATENCY_RECEIVE_STOP:
-            *latency_ms = 15;
+            *latency_ms = 5;
             break;
         case RF_API_LATENCY_DE_INIT_RX:
             *latency_ms = 0;
@@ -580,6 +693,9 @@ RF_API_status_t LR11XX_RF_API_get_latency(RF_API_latency_t latency_type, sfx_u32
         default :
             *latency_ms = 0;
     }
+#ifdef ERROR_CODES
+errors:
+#endif
     RETURN();
 }
 #endif
