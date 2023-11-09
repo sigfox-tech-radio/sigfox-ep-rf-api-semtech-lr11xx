@@ -7,6 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [v1.2](https://github.com/sigfox-tech-radio/sigfox-ep-rf-api-semtech-lr11xx/releases/tag/v1.2) - 09 Nov 2023
+
+### Added
+
+* Implement `RF_API_start_continuous_wave()` and `RF_API_stop_continuous_wave()` functions for **type approval addon**.
+
+### Removed
+
+* Remove `doc` folder since images are now hosted on the GitHub wiki.
+
+### Known limitations
+
+* **LBT** not implemented.
+
 ## [v1.1](https://github.com/sigfox-tech-radio/sigfox-ep-rf-api-semtech-lr11xx/releases/tag/v1.1) - 10 Aug 2023
 
 ### Added

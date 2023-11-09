@@ -201,6 +201,18 @@ RF_API_status_t LR11XX_RF_API_carrier_sense(RF_API_carrier_sense_parameters_t *c
 RF_API_status_t LR11XX_RF_API_get_latency(RF_API_latency_t latency_type, sfx_u32 *latency_ms);
 #endif
 
+#ifdef CERTIFICATION
+/*!******************************************************************
+ * \fn LR11XX_RF_API_status_t RF_API_start_continuous_wave(void)
+ * \brief Start continuous wave transmission using radio parameters given in the RF_API_init() function.
+ * \brief This function is only called by the type approval addon (EP-ADDON-TA). In asynchronous mode, it must not issue any completion callback.
+ * \param[in]  	none
+ * \param[out] 	none
+ * \retval		Function execution status.
+ *******************************************************************/
+RF_API_status_t LR11XX_RF_API_start_continuous_wave(void);
+#endif
+
 #ifdef VERBOSE
 /*!******************************************************************
  * \fn LR11XX_RF_API_status_t RF_API_get_version(sfx_u8 **version, sfx_u8 *version_size_char)

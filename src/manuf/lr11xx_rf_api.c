@@ -76,7 +76,7 @@ typedef struct {
 }lr1110_ctx_t;
 
 #ifdef VERBOSE
-static const sfx_u8 LR11XX_RF_API_VERSION[] = "v1.1";
+static const sfx_u8 LR11XX_RF_API_VERSION[] = "v1.2";
 #endif
 
 static lr1110_ctx_t lr1110_ctx = {
@@ -387,6 +387,9 @@ RF_API_status_t LR11XX_RF_API_init(RF_API_radio_parameters_t *radio_parameters) 
                 EXIT_ERROR(LR11XX_RF_API_ERROR_CHIP_RADIO_REG);
             break;
         case RF_API_MODULATION_NONE :
+            lr11xx_status = lr11xx_radio_set_pkt_type( SFX_NULL, LR11XX_RADIO_PKT_TYPE_RANGING);
+            if ( lr11xx_status != LR11XX_STATUS_OK)
+                EXIT_ERROR(LR11XX_RF_API_ERROR_CHIP_RADIO_REG);
             break;
         default:
             EXIT_ERROR(LR11XX_RF_API_ERROR_MODULATION);
@@ -700,6 +703,30 @@ errors:
 }
 #endif
 
+#ifdef CERTIFICATION
+/*******************************************************************/
+RF_API_status_t LR11XX_RF_API_start_continuous_wave(void) {
+#ifdef ERROR_CODES
+	RF_API_status_t status = RF_API_SUCCESS;
+    LR11XX_HW_API_status_t lr11xx_hw_api_status = LR11XX_HW_API_SUCCESS;
+#endif
+    lr11xx_status_t lr11xx_status;
+
+#ifdef ERROR_CODES
+        lr11xx_hw_api_status = LR11XX_HW_API_rx_on();
+        LR11XX_HW_API_check_status(LR11XX_RF_API_ERROR_DRIVER_LR11XX_HW_API);
+#else
+        LR11XX_HW_API_rx_on();
+#endif
+	// Start radio.
+    lr11xx_status = lr11xx_radio_set_tx_cw(SFX_NULL);
+    if ( lr11xx_status != LR11XX_STATUS_OK)
+        EXIT_ERROR(LR11XX_RF_API_ERROR_CHIP_RADIO_REG);
+errors:
+    RETURN();
+}
+#endif
+
 #ifdef VERBOSE
 RF_API_status_t LR11XX_RF_API_get_version(sfx_u8 **version, sfx_u8 *version_size_char) {
 #ifdef ERROR_CODES
@@ -794,6 +821,13 @@ inline RF_API_status_t RF_API_carrier_sense(RF_API_carrier_sense_parameters_t *c
 /*******************************************************************/
 inline RF_API_status_t RF_API_get_latency(RF_API_latency_t latency_type, sfx_u32 *latency_ms) {
 	return LR11XX_RF_API_get_latency(latency_type, latency_ms);
+}
+#endif
+
+#ifdef CERTIFICATION
+/*******************************************************************/
+inline RF_API_status_t RF_API_start_continuous_wave(void) {
+	return LR11XX_RF_API_start_continuous_wave();
 }
 #endif
 
