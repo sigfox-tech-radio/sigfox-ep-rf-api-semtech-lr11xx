@@ -84,6 +84,76 @@ typedef enum
     LR11XX_HW_API_FEM_GNSS   ,
 } LR11XX_HW_API_FEM_t;
 
+/*!******************************************************************
+ * \enum LR11XX_HW_API_tcxo_ctrl_t
+ * \brief TCXO voltage configuration
+ *******************************************************************/
+typedef enum
+{
+    LR11XX_HW_API_TCXO_CTRL_1_6V = 0x00,
+    LR11XX_HW_API_TCXO_CTRL_1_7V ,
+    LR11XX_HW_API_TCXO_CTRL_1_8V ,
+    LR11XX_HW_API_TCXO_CTRL_2_2V ,
+    LR11XX_HW_API_TCXO_CTRL_2_4V ,
+    LR11XX_HW_API_TCXO_CTRL_2_7V ,
+    LR11XX_HW_API_TCXO_CTRL_3_0V ,
+    LR11XX_HW_API_TCXO_CTRL_3_3V ,
+    LR11XX_HW_API_TCXO_CTRL_LAST,
+} LR11XX_HW_API_tcxo_supply_voltage_t;
+
+/*!******************************************************************
+ * \enum LR11XX_HW_API_radio_pa_selection_t
+ * \brief Power Amplifier Selection values
+ * \brief   - Low-power Power Amplifier can reach up to 14dBm
+ * \brief   - High-power Power Amplifier can reach up to 22 dBm
+ *******************************************************************/
+typedef enum
+{
+    LR11XX_HW_API_RADIO_PA_SEL_LP   = 0x00,  //!< Low-power Power Amplifier
+    LR11XX_HW_API_RADIO_PA_SEL_HP   = 0x01,  //!< High-power Power Amplifier
+    LR11XX_HW_API_RADIO_PA_SEL_HF   = 0x02,  //!< High-frequency Power Amplifier
+} LR11XX_HW_API_radio_pa_selection_t;
+
+/*!
+ * \enum LR11XX_HW_API_radio_pa_reg_supply_t
+ * @brief Select power amplifier supply source
+ */
+typedef enum
+{
+    LR11XX_HW_API_RADIO_PA_REG_SUPPLY_VREG = 0x00,  //!< Power amplifier supplied by the main regulator
+    LR11XX_HW_API_RADIO_PA_REG_SUPPLY_VBAT = 0x01   //!< Power amplifier supplied by the battery
+} LR11XX_HW_API_radio_pa_reg_supply_t;
+
+/*!******************************************************************
+ * \struct LR11XX_HW_API_oscillator_type_t
+ * \brief LR11XX oscillator configuration.
+ *******************************************************************/
+typedef struct {
+    sfx_u8  has_tcxo;
+    LR11XX_HW_API_tcxo_supply_voltage_t tcxo_supply_voltage;
+    sfx_u32 startup_time_in_tick;
+} LR11XX_HW_API_xosc_cfg_t;
+
+/*!******************************************************************
+ * \struct LR11XX_HW_API_pa_cfg_t
+ * \brief Configuration of Power Amplifier
+ *******************************************************************/
+typedef struct {
+    LR11XX_HW_API_radio_pa_selection_t  pa_sel;         //!< Power Amplifier selection
+    LR11XX_HW_API_radio_pa_reg_supply_t pa_reg_supply;  //!< Power Amplifier regulator supply source
+    sfx_u8  pa_duty_cycle;                              //!< Power Amplifier duty cycle (Default 0x04)
+    sfx_u8  pa_hp_sel;                                  //!< Number of slices for HPA (Default 0x07)
+} LR11XX_HW_API_pa_cfg_t;
+
+/*!******************************************************************
+ * \struct LR11XX_HW_API_pa_pwr_cfg_t
+ * \brief TODO
+ *******************************************************************/
+typedef struct {
+    sfx_s8 power;
+    LR11XX_HW_API_pa_cfg_t pa_config;
+}LR11XX_HW_API_pa_pwr_cfg_t;
+
 #if (defined TIMER_REQUIRED) && (defined LATENCY_COMPENSATION)
 /*!******************************************************************
  * \enum LR11XX_HW_API_latency_t
@@ -135,8 +205,8 @@ LR11XX_HW_API_status_t LR11XX_HW_API_delayMs(unsigned short delay_ms);
 
  * \fn LR11XX_HW_API_status_t LR11XX_HW_API_get_fem_mask(LR11XX_HW_API_FEM_t fem, sfx_u8 *rfsw_dio_mask);
  * \brief  Lock configuration of several pins for a dedicated port.
- * \param[in]  fem front end module or switch configuration.
- * \param[out] rfsw_dio_mask This parameter can be a combination of the following values:
+ * \param[in]  fem: front end module or switch configuration.
+ * \param[out] rfsw_dio_mask: This parameter can be a combination of the following values:
  *      \arg \ref LR11XX_HW_API_RFSW0_DIO5
  *      \arg \ref LR11XX_HW_API_RFSW1_DIO6
  *      \arg \ref LR11XX_HW_API_RFSW2_DIO7
@@ -145,6 +215,24 @@ LR11XX_HW_API_status_t LR11XX_HW_API_delayMs(unsigned short delay_ms);
  * \retval Function execution status
  *******************************************************************/
 LR11XX_HW_API_status_t LR11XX_HW_API_get_fem_mask(LR11XX_HW_API_FEM_t fem, sfx_u8 *rfsw_dio_mask);
+
+/*!******************************************************************
+ * \fn LR11XX_HW_API_status_t LR11XX_HW_API_get_xosc_cfg(LR11XX_HW_API_xosc_cfg_t *xosc_cfg);
+ * \brief Get oscillator configuration according to hardware matching. For more informations see LR11XX User Manual (chapter 6.3.2).
+ * \param[out]  xosc_cfg: Pointer to oscillator structure configuration compatible with the hardware.
+ * \retval      Function execution status.
+ *******************************************************************/
+LR11XX_HW_API_status_t LR11XX_HW_API_get_xosc_cfg(LR11XX_HW_API_xosc_cfg_t *xosc_cfg);
+
+/*!******************************************************************
+ * \fn LR11XX_HW_API_status_t LR11XX_HW_API_get_pa_pwr_cfg(LR11XX_HW_API_pa_pwr_cfg_t *pa_pwr_cfg, sfx_u32 rf_freq_in_hz, sfx_s8 expected_output_pwr_in_dbm);
+ * \brief Get the LR11XX PA power and configuration according to hardware matching. For more informations see LR11XX User Manual (chapter 9.5.1 / 9.5.2) or contact Semtech.
+ * \param[in]   rf_freq_in_hz: RF frequence in Hz
+ * \param[in]   expected_output_pwr_in_dbm: TX output power in dBm
+ * \param[out]  pa_pwr_cfg: Pointer to PA power configuration structure
+ * \retval      Function execution status.
+ *******************************************************************/
+LR11XX_HW_API_status_t LR11XX_HW_API_get_pa_pwr_cfg(LR11XX_HW_API_pa_pwr_cfg_t *pa_pwr_cfg, sfx_u32 rf_freq_in_hz, sfx_s8 expected_output_pwr_in_dbm);
 
 /*!******************************************************************
  * \fn LR11XX_HW_API_status_t LR11XX_HW_API_tx_on(void);

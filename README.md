@@ -11,7 +11,8 @@ The table below shows the versions compatibility between this radio example and 
 
 | **LR11XX_RF_API** | **EP_LIB** |
 |:---:|:---:|
-| [v1.2](https://github.com/sigfox-tech-radio/sigfox-ep-rf-api-semtech-lr11xx/releases/tag/v1.2) | >= [v3.4](https://github.com/sigfox-tech-radio/sigfox-ep-lib/releases/tag/v3.4) |
+| [v2.0](https://github.com/sigfox-tech-radio/sigfox-ep-rf-api-semtech-lr11xx/releases/tag/v2.0) | >= [v3.5](https://github.com/sigfox-tech-radio/sigfox-ep-lib/releases/tag/v3.5) |
+| [v1.2](https://github.com/sigfox-tech-radio/sigfox-ep-rf-api-semtech-lr11xx/releases/tag/v1.2) | [v3.4](https://github.com/sigfox-tech-radio/sigfox-ep-lib/releases/tag/v3.4) |
 | [v1.1](https://github.com/sigfox-tech-radio/sigfox-ep-rf-api-semtech-lr11xx/releases/tag/v1.1) | [v3.2](https://github.com/sigfox-tech-radio/sigfox-ep-lib/releases/tag/v3.2) to [v3.3](https://github.com/sigfox-tech-radio/sigfox-ep-lib/releases/tag/v3.3)|
 | [v1.0](https://github.com/sigfox-tech-radio/sigfox-ep-rf-api-semtech-lr11xx/releases/tag/v1.0) | [v3.2](https://github.com/sigfox-tech-radio/sigfox-ep-lib/releases/tag/v3.2) to [v3.3](https://github.com/sigfox-tech-radio/sigfox-ep-lib/releases/tag/v3.3)|
 
@@ -114,14 +115,14 @@ make precompil_lr11xx_rf_api
 ```bash
 cmake -DSIGFOX_EP_LIB_DIR=<sigfox-ep-lib path> \
       -DUSE_SIGFOX_EP_FLAGS_H=OFF \
-      -DRC1=ON \
-      -DRC2=ON \
-      -DRC3C=ON \
-      -DRC3D=ON \
-      -DRC4=ON \
-      -DRC5=ON \
-      -DRC6=ON \
-      -DRC7=ON \
+      -DRC1_ZONE=ON \
+      -DRC2_ZONE=ON \
+      -DRC3C_ZONE=ON \
+      -DRC3D_ZONE=ON \
+      -DRC4_ZONE=ON \
+      -DRC5_ZONE=ON \
+      -DRC6_ZONE=ON \
+      -DRC7_ZONE=ON \
       -DAPPLICATION_MESSAGES=ON \
       -DCONTROL_KEEP_ALIVE_MESSAGE=ON \
       -DBIDIRECTIONAL=ON \
@@ -176,14 +177,14 @@ make lr11xx_rf_api
 ```bash
 cmake -DSIGFOX_EP_LIB_DIR=<sigfox-ep-lib path> \
       -DUSE_SIGFOX_EP_FLAGS_H=OFF \
-      -DRC1=ON \
-      -DRC2=ON \
-      -DRC3C=ON \
-      -DRC3D=ON \
-      -DRC4=ON \
-      -DRC5=ON \
-      -DRC6=ON \
-      -DRC7=ON \
+      -DRC1_ZONE=ON \
+      -DRC2_ZONE=ON \
+      -DRC3C_ZONE=ON \
+      -DRC3D_ZONE=ON \
+      -DRC4_ZONE=ON \
+      -DRC5_ZONE=ON \
+      -DRC6_ZONE=ON \
+      -DRC7_ZONE=ON \
       -DAPPLICATION_MESSAGES=ON \
       -DCONTROL_KEEP_ALIVE_MESSAGE=ON \
       -DBIDIRECTIONAL=ON \

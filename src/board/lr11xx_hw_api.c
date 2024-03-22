@@ -80,6 +80,22 @@ LR11XX_HW_API_status_t LR11XX_HW_API_get_fem_mask(LR11XX_HW_API_FEM_t fem, sfx_u
     RETURN();
 }
 
+LR11XX_HW_API_status_t LR11XX_HW_API_get_xosc_cfg(LR11XX_HW_API_xosc_cfg_t *xosc_cfg) {
+    /* To be implemented by the device manufacturer */
+#ifdef ERROR_CODES
+    LR11XX_HW_API_status_t status = LR11XX_HW_API_SUCCESS;
+#endif
+    RETURN();
+}
+
+LR11XX_HW_API_status_t LR11XX_HW_API_get_pa_pwr_cfg(LR11XX_HW_API_pa_pwr_cfg_t *pa_pwr_cfg, sfx_u32 rf_freq_in_hz, sfx_s8 expected_output_pwr_in_dbm){
+    /* To be implemented by the device manufacturer */
+#ifdef ERROR_CODES
+    LR11XX_HW_API_status_t status = LR11XX_HW_API_SUCCESS;
+#endif
+    RETURN();
+}
+
 LR11XX_HW_API_status_t LR11XX_HW_API_tx_on(void) {
 	/* To be implemented by the device manufacturer */
 #ifdef ERROR_CODES

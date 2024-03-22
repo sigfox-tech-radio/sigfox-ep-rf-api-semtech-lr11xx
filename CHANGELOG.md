@@ -7,6 +7,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [v2.0](https://github.com/sigfox-tech-radio/sigfox-ep-rf-api-semtech-lr11xx/releases/tag/v2.0) - 22 Mar 2024
+
+### Changed
+
+* BIDIRECTIONAL flag compilation issue
+* Rename **smtc_dpbsk.c** to **smtc_dbpsk.c**.
+* Rename `RCx` compilation flags into `RCx_ZONE` for **Microchip MCUs compatibility**.
+* Update with 2.4.1 SWDR001 semtech drivers.
+
+### Removed
+
+* Remove **stmtc_sigfox_lr11xx.h** file.
+
+### Added
+
+* New methods in **LR11XX_HW_API** to configure output power board oscillator.
+
 ## [v1.2](https://github.com/sigfox-tech-radio/sigfox-ep-rf-api-semtech-lr11xx/releases/tag/v1.2) - 09 Nov 2023
 
 ### Added
