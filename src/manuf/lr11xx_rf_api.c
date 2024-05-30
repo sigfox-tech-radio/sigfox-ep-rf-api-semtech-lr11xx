@@ -75,7 +75,7 @@ typedef struct {
 }lr1110_ctx_t;
 
 #ifdef VERBOSE
-static const sfx_u8 LR11XX_RF_API_VERSION[] = "v2.0";
+static const sfx_u8 LR11XX_RF_API_VERSION[] = "v2.1";
 #endif
 
 static lr1110_ctx_t lr1110_ctx = {
@@ -119,6 +119,8 @@ RF_API_status_t LR11XX_RF_API_open(RF_API_config_t *config) {
 #ifdef ASYNCHRONOUS
     lr1110_ctx.callbacks.process_cb = config->process_cb;
     lr1110_ctx.callbacks.error_cb = config->error_cb;
+#else
+    SFX_UNUSED(config);
 #endif
 #ifdef ERROR_CODES
     LR11XX_HW_API_open(&LR11XX_irq);
@@ -161,6 +163,7 @@ RF_API_status_t LR11XX_RF_API_process(void)
             lr1110_ctx.callbacks.tx_cplt_cb();
 #endif
     }
+#ifdef BIDIRECTIONAL
     if (lr11xx_system_irq_mask & LR11XX_SYSTEM_IRQ_RX_DONE) {
 #ifdef ERROR_CODES
         lr11xx_hw_api_status = LR11XX_HW_API_rx_off();
@@ -169,11 +172,12 @@ RF_API_status_t LR11XX_RF_API_process(void)
         LR11XX_HW_API_rx_off();
 #endif
         lr1110_ctx.rx_done_flag = 1;
-#if (defined ASYNCHRONOUS) && (defined BIDIRECTIONAL)
+#ifdef ASYNCHRONOUS
         if (lr1110_ctx.callbacks.rx_data_received_cb != SFX_NULL)
             lr1110_ctx.callbacks.rx_data_received_cb();
 #endif
     }
+#endif
     if (lr11xx_system_irq_mask & LR11XX_SYSTEM_IRQ_ERROR) {
         lr1110_ctx.error_flag = 1;
 #ifdef ASYNCHRONOUS
@@ -349,7 +353,11 @@ RF_API_status_t LR11XX_RF_API_wake_up(void) {
 #else
     LR11XX_HW_API_delayMs(300);
 #endif
+#ifdef BIDIRECTIONAL
     lr11xx_status = lr11xx_system_set_dio_irq_params(SFX_NULL, LR11XX_SYSTEM_IRQ_TX_DONE | LR11XX_SYSTEM_IRQ_RX_DONE | LR11XX_SYSTEM_IRQ_ERROR, 0);
+#else
+    lr11xx_status = lr11xx_system_set_dio_irq_params(SFX_NULL, LR11XX_SYSTEM_IRQ_TX_DONE | LR11XX_SYSTEM_IRQ_ERROR, 0);
+#endif
     if ( lr11xx_status != LR11XX_STATUS_OK)
         EXIT_ERROR((RF_API_status_t) LR11XX_RF_API_ERROR_CHIP_SYSTEM_REG);
     lr11xx_status = lr11xx_system_clear_irq_status( SFX_NULL, LR11XX_SYSTEM_IRQ_ALL_MASK );
@@ -499,11 +507,13 @@ RF_API_status_t LR11XX_RF_API_de_init(void) {
     lr11xx_status = lr11xx_system_set_standby(SFX_NULL, LR11XX_SYSTEM_STANDBY_CFG_XOSC);
     if ( lr11xx_status != LR11XX_STATUS_OK)
         EXIT_ERROR((RF_API_status_t) LR11XX_RF_API_ERROR_CHIP_SYSTEM_REG);
+#ifdef BIDIRECTIONAL
 #ifdef ERROR_CODES
     lr11xx_hw_api_status = LR11XX_HW_API_rx_off();
     LR11XX_HW_API_check_status((RF_API_status_t) LR11XX_RF_API_ERROR_DRIVER_LR11XX_HW_API);
 #else
     LR11XX_HW_API_rx_off();
+#endif
 #endif
 #ifdef ERROR_CODES
     lr11xx_hw_api_status = LR11XX_HW_API_tx_off();
@@ -694,10 +704,11 @@ errors:
 
 #if (defined REGULATORY) && (defined SPECTRUM_ACCESS_LBT)
 RF_API_status_t LR11XX_RF_API_carrier_sense(RF_API_carrier_sense_parameters_t *carrier_sense_params){
-    /*TODO*/
+    /* To be implemented by the device manufacturer */
 #ifdef ERROR_CODES
     RF_API_status_t status = RF_API_SUCCESS;
 #endif
+    SFX_UNUSED(carrier_sense_params);
     RETURN();
 }
 #endif
@@ -708,7 +719,7 @@ RF_API_status_t LR11XX_RF_API_get_latency(RF_API_latency_t latency_type, sfx_u32
     RF_API_status_t status = RF_API_SUCCESS;
     LR11XX_HW_API_status_t lr11xx_hw_api_status = LR11XX_HW_API_SUCCESS;
 #endif
-    sfx_u32 latency_tmp;
+    sfx_u32 latency_tmp = 0;
 
     switch(latency_type) {
         case RF_API_LATENCY_WAKE_UP :
@@ -777,10 +788,10 @@ RF_API_status_t LR11XX_RF_API_start_continuous_wave(void) {
     lr11xx_status_t lr11xx_status;
 
 #ifdef ERROR_CODES
-        lr11xx_hw_api_status = LR11XX_HW_API_rx_on();
+        lr11xx_hw_api_status = LR11XX_HW_API_tx_on();
         LR11XX_HW_API_check_status((RF_API_status_t) LR11XX_RF_API_ERROR_DRIVER_LR11XX_HW_API);
 #else
-        LR11XX_HW_API_rx_on();
+        LR11XX_HW_API_tx_on();
 #endif
 	// Start radio.
     lr11xx_status = lr11xx_radio_set_tx_cw(SFX_NULL);

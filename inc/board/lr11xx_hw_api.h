@@ -252,6 +252,7 @@ LR11XX_HW_API_status_t LR11XX_HW_API_tx_on(void);
  *******************************************************************/
 LR11XX_HW_API_status_t LR11XX_HW_API_tx_off(void);
 
+#ifdef BIDIRECTIONAL
 /*!******************************************************************
  * \fn LR11XX_HW_API_status_t LR11XX_HW_API_rx_on(void);
  * \brief Radio chipset will be start the RX.
@@ -260,7 +261,9 @@ LR11XX_HW_API_status_t LR11XX_HW_API_tx_off(void);
  * \retval		Function execution status.
  *******************************************************************/
 LR11XX_HW_API_status_t LR11XX_HW_API_rx_on(void);
+#endif
 
+#ifdef BIDIRECTIONAL
 /*!******************************************************************
  * \fn LR11XX_HW_API_status_t LR11XX_HW_API_rx_off(void);
  * \brief Radio chipset just stopped the RX.
@@ -269,6 +272,7 @@ LR11XX_HW_API_status_t LR11XX_HW_API_rx_on(void);
  * \retval		Function execution status.
  *******************************************************************/
 LR11XX_HW_API_status_t LR11XX_HW_API_rx_off(void);
+#endif
 
 #if (defined TIMER_REQUIRED) && (defined LATENCY_COMPENSATION)
 /*!******************************************************************

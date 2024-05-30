@@ -7,6 +7,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [v2.1](https://github.com/sigfox-tech-radio/sigfox-ep-rf-api-semtech-lr11xx/releases/tag/v2.1) - 30 May 2024
+
+### Added
+
+* Add weak attribute to functions templates.
+* Add **SFX_UNUSED** macro to remove extra warnings.
+* Add bidirectional flag on HW API RX on and RX off functions.
+
+### Fixed
+
+* Initialize local latency variables to 0.
+
+### Removed
+
+* Remove lr11xx_hw_api.c from **LR11XX_RF_API_SOURCES** in `CMakeLists.txt`.
+
 ## [v2.0](https://github.com/sigfox-tech-radio/sigfox-ep-rf-api-semtech-lr11xx/releases/tag/v2.0) - 22 Mar 2024
 
 ### Changed
