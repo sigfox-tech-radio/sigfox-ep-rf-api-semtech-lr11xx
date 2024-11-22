@@ -11,7 +11,8 @@ The table below shows the versions compatibility between this radio example and 
 
 | **LR11XX_RF_API** | **EP_LIB** |
 |:---:|:---:|
-| [v2.1](https://github.com/sigfox-tech-radio/sigfox-ep-rf-api-semtech-lr11xx/releases/tag/v2.1) | >= [v3.6](https://github.com/sigfox-tech-radio/sigfox-ep-lib/releases/tag/v3.6) |
+| [v3.0](https://github.com/sigfox-tech-radio/sigfox-ep-rf-api-semtech-lr11xx/releases/tag/v3.0) | >= [v4.0](https://github.com/sigfox-tech-radio/sigfox-ep-lib/releases/tag/v4.0) |
+| [v2.1](https://github.com/sigfox-tech-radio/sigfox-ep-rf-api-semtech-lr11xx/releases/tag/v2.1) | [v3.6](https://github.com/sigfox-tech-radio/sigfox-ep-lib/releases/tag/v3.6) |
 | [v2.0](https://github.com/sigfox-tech-radio/sigfox-ep-rf-api-semtech-lr11xx/releases/tag/v2.0) | [v3.5](https://github.com/sigfox-tech-radio/sigfox-ep-lib/releases/tag/v3.5) |
 | [v1.2](https://github.com/sigfox-tech-radio/sigfox-ep-rf-api-semtech-lr11xx/releases/tag/v1.2) | [v3.4](https://github.com/sigfox-tech-radio/sigfox-ep-lib/releases/tag/v3.4) |
 | [v1.1](https://github.com/sigfox-tech-radio/sigfox-ep-rf-api-semtech-lr11xx/releases/tag/v1.1) | [v3.2](https://github.com/sigfox-tech-radio/sigfox-ep-lib/releases/tag/v3.2) to [v3.3](https://github.com/sigfox-tech-radio/sigfox-ep-lib/releases/tag/v3.3)|
@@ -27,7 +28,7 @@ The table below shows the versions compatibility between this radio example and 
 
 This radio example inherits all the [Sigfox End-Point library flags](https://github.com/sigfox-tech-radio/sigfox-ep-lib/wiki/compilation-flags-for-optimization) and can be optimized accordingly.
 
-The `LOW_LEVEL_OPEN_CLOSE` flag must be enabled to use this example.
+The `SIGFOX_EP_LOW_LEVEL_OPEN_CLOSE` flag must be enabled to use this example.
 
 ## How to add LR11XX RF API example to your project
 
@@ -43,8 +44,6 @@ The templates are located in the `src/board` folder.
 ### Submodule
 
 The best way to embed the LR11XX RF API example into your project is to use a [Git submodule](https://git-scm.com/book/en/v2/Git-Tools-Submodules), in a similar way to the library. The radio driver will be seen as a sub-repository with independant history. It will be much easier to **upgrade the radio driver** or to **switch between versions** when necessary, by using the common `git pull` and `git checkout` commands within the `sigfox-ep-rf-api-st-s2lp` folder.
-
-In order to keep the repository clean, you will need to **exclude** the `src/board` folder from build (where the board templates are defined) and implement the functions in another location of your project.
 
 To add the LR11XX RF API submodule, go to your project location and run the following commands:
 
@@ -101,50 +100,37 @@ To perform the precompilation, you have to install `cmake` and `unifdef` tools, 
 cd sigfox-ep-rf-api-semtech-lr11xx/
 mkdir build
 cd build/
-```
-
-* Precompiling by reading the `sigfox_ep_flags.h` file:
-
-```bash
 cmake -DSIGFOX_EP_LIB_DIR=<sigfox-ep-lib path> \
-      -DUSE_SIGFOX_EP_FLAGS_H=ON ..
-make precompil_lr11xx_rf_api
-```
-
-* Precompiling by entering the flags selection on command line:
-
-```bash
-cmake -DSIGFOX_EP_LIB_DIR=<sigfox-ep-lib path> \
-      -DUSE_SIGFOX_EP_FLAGS_H=OFF \
-      -DRC1_ZONE=ON \
-      -DRC2_ZONE=ON \
-      -DRC3C_ZONE=ON \
-      -DRC3D_ZONE=ON \
-      -DRC4_ZONE=ON \
-      -DRC5_ZONE=ON \
-      -DRC6_ZONE=ON \
-      -DRC7_ZONE=ON \
-      -DAPPLICATION_MESSAGES=ON \
-      -DCONTROL_KEEP_ALIVE_MESSAGE=ON \
-      -DBIDIRECTIONAL=ON \
-      -DASYNCHRONOUS=ON \
-      -DLOW_LEVEL_OPEN_CLOSE=ON \
-      -DREGULATORY=ON \
-      -DLATENCY_COMPENSATION=ON \
-      -DSINGLE_FRAME=ON \
-      -DUL_BIT_RATE_BPS=OFF \
-      -DTX_POWER_DBM_EIRP=OFF \
-      -DT_IFU_MS=OFF \
-      -DT_CONF_MS=OFF \
-      -DUL_PAYLOAD_SIZE=OFF \
-      -DCRC_HW=OFF \
-      -DMESSAGE_COUNTER_ROLLOVER=OFF \
-      -DPARAMETERS_CHECK=ON \
-      -DCERTIFICATION=ON \
-      -DPUBLIC_KEY_CAPABLE=ON \
-      -DVERBOSE=ON \
-      -DERROR_CODES=ON \
-      -DERROR_STACK=12 ..
+      -DSIGFOX_EP_RC1_ZONE=ON \
+      -DSIGFOX_EP_RC2_ZONE=ON \
+      -DSIGFOX_EP_RC3_LBT_ZONE=ON \
+      -DSIGFOX_EP_RC3_LDC_ZONE=ON \
+      -DSIGFOX_EP_RC4_ZONE=ON \
+      -DSIGFOX_EP_RC5_ZONE=ON \
+      -DSIGFOX_EP_RC6_ZONE=ON \
+      -DSIGFOX_EP_RC7_ZONE=ON \
+      -DSIGFOX_EP_APPLICATION_MESSAGES=ON \
+      -DSIGFOX_EP_CONTROL_KEEP_ALIVE_MESSAGE=ON \
+      -DSIGFOX_EP_BIDIRECTIONAL=ON \
+      -DSIGFOX_EP_ASYNCHRONOUS=ON \
+      -DSIGFOX_EP_LOW_LEVEL_OPEN_CLOSE=ON \
+      -DSIGFOX_EP_REGULATORY=ON \
+      -DSIGFOX_EP_LATENCY_COMPENSATION=ON \
+      -DSIGFOX_EP_SINGLE_FRAME=ON \
+      -DSIGFOX_EP_UL_BIT_RATE_BPS=OFF \
+      -DSIGFOX_EP_TX_POWER_DBM_EIRP=OFF \
+      -DSIGFOX_EP_T_IFU_MS=OFF \
+      -DSIGFOX_EP_T_CONF_MS=OFF \
+      -DSIGFOX_EP_UL_PAYLOAD_SIZE=OFF \
+      -DSIGFOX_EP_AES_HW=ON \
+      -DSIGFOX_EP_CRC_HW=OFF \
+      -DSIGFOX_EP_MESSAGE_COUNTER_ROLLOVER=OFF \
+      -DSIGFOX_EP_PARAMETERS_CHECK=ON \
+      -DSIGFOX_EP_CERTIFICATION=ON \
+      -DSIGFOX_EP_PUBLIC_KEY_CAPABLE=ON \
+      -DSIGFOX_EP_VERBOSE=ON \
+      -DSIGFOX_EP_ERROR_CODES=ON \
+      -DSIGFOX_EP_ERROR_STACK=12 ..
 make precompil_lr11xx_rf_api
 ```
 
@@ -163,49 +149,37 @@ To build a static library, you have to install `cmake` tool and run the followin
 cd sigfox-ep-rf-api-semtech-lr11xx/
 mkdir build
 cd build/
-```
-
-* Building by reading the `sigfox_ep_flags.h` file:
-
-```bash
 cmake -DSIGFOX_EP_LIB_DIR=<sigfox-ep-lib path> \
-      -DUSE_SIGFOX_EP_FLAGS_H=ON ..
-make lr11xx_rf_api
-```
-
-* Building by entering the flags selection on command line:
-
-```bash
-cmake -DSIGFOX_EP_LIB_DIR=<sigfox-ep-lib path> \
-      -DUSE_SIGFOX_EP_FLAGS_H=OFF \
-      -DRC1_ZONE=ON \
-      -DRC2_ZONE=ON \
-      -DRC3C_ZONE=ON \
-      -DRC3D_ZONE=ON \
-      -DRC4_ZONE=ON \
-      -DRC5_ZONE=ON \
-      -DRC6_ZONE=ON \
-      -DRC7_ZONE=ON \
-      -DAPPLICATION_MESSAGES=ON \
-      -DCONTROL_KEEP_ALIVE_MESSAGE=ON \
-      -DBIDIRECTIONAL=ON \
-      -DASYNCHRONOUS=ON \
-      -DLOW_LEVEL_OPEN_CLOSE=ON \
-      -DREGULATORY=ON \
-      -DLATENCY_COMPENSATION=ON \
-      -DSINGLE_FRAME=ON \
-      -DPARAMETERS_CHECK=ON \
-      -DCERTIFICATION=ON \
-      -DPUBLIC_KEY_CAPABLE=ON \
-      -DVERBOSE=ON \
-      -DCRC_HW=OFF \
-      -DERROR_CODES=ON \
-      -DUL_BIT_RATE_BPS=OFF \
-      -DT_IFU_MS=OFF \
-      -DT_CONF_MS=OFF \
-      -DUL_PAYLOAD_SIZE=OFF \
-      -DMESSAGE_COUNTER_ROLLOVER=OFF \
-      -DERROR_STACK=12 ..
+      -DSIGFOX_EP_RC1_ZONE=ON \
+      -DSIGFOX_EP_RC2_ZONE=ON \
+      -DSIGFOX_EP_RC3_LBT_ZONE=ON \
+      -DSIGFOX_EP_RC3_LDC_ZONE=ON \
+      -DSIGFOX_EP_RC4_ZONE=ON \
+      -DSIGFOX_EP_RC5_ZONE=ON \
+      -DSIGFOX_EP_RC6_ZONE=ON \
+      -DSIGFOX_EP_RC7_ZONE=ON \
+      -DSIGFOX_EP_APPLICATION_MESSAGES=ON \
+      -DSIGFOX_EP_CONTROL_KEEP_ALIVE_MESSAGE=ON \
+      -DSIGFOX_EP_BIDIRECTIONAL=ON \
+      -DSIGFOX_EP_ASYNCHRONOUS=ON \
+      -DSIGFOX_EP_LOW_LEVEL_OPEN_CLOSE=ON \
+      -DSIGFOX_EP_REGULATORY=ON \
+      -DSIGFOX_EP_LATENCY_COMPENSATION=ON \
+      -DSIGFOX_EP_SINGLE_FRAME=ON \
+      -DSIGFOX_EP_UL_BIT_RATE_BPS=OFF \
+      -DSIGFOX_EP_TX_POWER_DBM_EIRP=OFF \
+      -DSIGFOX_EP_T_IFU_MS=OFF \
+      -DSIGFOX_EP_T_CONF_MS=OFF \
+      -DSIGFOX_EP_UL_PAYLOAD_SIZE=OFF \
+      -DSIGFOX_EP_AES_HW=ON \
+      -DSIGFOX_EP_CRC_HW=OFF \
+      -DSIGFOX_EP_MESSAGE_COUNTER_ROLLOVER=OFF \
+      -DSIGFOX_EP_PARAMETERS_CHECK=ON \
+      -DSIGFOX_EP_CERTIFICATION=ON \
+      -DSIGFOX_EP_PUBLIC_KEY_CAPABLE=ON \
+      -DSIGFOX_EP_VERBOSE=ON \
+      -DSIGFOX_EP_ERROR_CODES=ON \
+      -DSIGFOX_EP_ERROR_STACK=12 ..
 make lr11xx_rf_api
 ```
 

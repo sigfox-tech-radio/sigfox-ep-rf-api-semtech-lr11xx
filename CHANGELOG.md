@@ -7,6 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [v3.0](https://github.com/sigfox-tech-radio/sigfox-ep-rf-api-semtech-lr11xx/releases/tag/v3.0) - 22 Nov 2024
+
+### Changed
+
+* Upgrade to **sigfox-ep-lib v4.0**
+* Use lr11xx_rf_api_obj target object to build lr11xx_rf_api library.
+* Remove unifdef dependency in all cmake with linked target.
+* Update lr11xx semtech driver to 2.5.0.
+* Add **LR11XX_HW_API_config_t** structure in HW API open function with **radio configuration pointer** to manage multi-RC front-ends.
+
+### Known limitations
+
+* **LBT** not implemented
+
 ## [v2.1](https://github.com/sigfox-tech-radio/sigfox-ep-rf-api-semtech-lr11xx/releases/tag/v2.1) - 30 May 2024
 
 ### Added
