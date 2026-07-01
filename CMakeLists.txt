@@ -75,7 +75,7 @@ if (NOT TARGET lr11xx_driver)
         GIT_PROGRESS TRUE
         GIT_SHALLOW TRUE
         GIT_REPOSITORY    https://github.com/Lora-net/SWDR001.git
-        GIT_TAG           v2.5.0
+        GIT_TAG           v3.0.0
     )
 else ()
     list(APPEND CHIP_RF_HEADERS_LIST "$<BUILD_INTERFACE:$<TARGET_PROPERTY:lr11xx_driver,INTERFACE_INCLUDE_DIRECTORIES>>")

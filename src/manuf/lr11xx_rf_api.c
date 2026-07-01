@@ -75,7 +75,7 @@ typedef struct {
 } lr1110_ctx_t;
 
 #ifdef SIGFOX_EP_VERBOSE
-static const sfx_u8 LR11XX_RF_API_VERSION[] = "v3.0";
+static const sfx_u8 LR11XX_RF_API_VERSION[] = "v3.1";
 #endif
 
 static lr1110_ctx_t lr1110_ctx = {
@@ -144,7 +144,11 @@ errors:
 #endif
 
 /*******************************************************************/
+#ifdef SIGFOX_EP_ASYNCHRONOUS
 RF_API_status_t LR11XX_RF_API_process(void) {
+#else
+static RF_API_status_t LR11XX_RF_API_process(void) {
+#endif
 #ifdef SIGFOX_EP_ERROR_CODES
     RF_API_status_t status = RF_API_SUCCESS;
     LR11XX_HW_API_status_t lr11xx_hw_api_status = LR11XX_HW_API_SUCCESS;
@@ -583,8 +587,8 @@ RF_API_status_t LR11XX_RF_API_send(RF_API_tx_data_t *tx_data) {
     buffer[tx_data->bitstream_size_bytes] = 0x80;
     dbpsk_encode_buffer(buffer, tx_data->bitstream_size_bytes * 8 + 2, buffer);
     /*Set the BPSK packet param*/
-    lr11xx_radio_pkt_params_bpsk.pld_len_in_bits = dbpsk_get_pld_len_in_bits(tx_data->bitstream_size_bytes * 8);
-    lr11xx_radio_pkt_params_bpsk.pld_len_in_bytes = dbpsk_get_pld_len_in_bytes(tx_data->bitstream_size_bytes * 8);
+    lr11xx_radio_pkt_params_bpsk.pld_len_in_bits = (sfx_u16) dbpsk_get_pld_len_in_bits(tx_data->bitstream_size_bytes * 8);
+    lr11xx_radio_pkt_params_bpsk.pld_len_in_bytes = (sfx_u8) dbpsk_get_pld_len_in_bytes(tx_data->bitstream_size_bytes * 8);
     if (lr1110_ctx.backup_bit_rate_bps_patch == 100) {
         lr11xx_radio_pkt_params_bpsk.ramp_down_delay = LR11XX_RADIO_SIGFOX_DBPSK_RAMP_DOWN_TIME_100_BPS;
         lr11xx_radio_pkt_params_bpsk.ramp_up_delay = LR11XX_RADIO_SIGFOX_DBPSK_RAMP_DOWN_TIME_100_BPS;
