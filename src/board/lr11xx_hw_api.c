@@ -47,7 +47,7 @@
 LR11XX_HW_API_status_t __attribute__((weak)) LR11XX_HW_API_open(LR11XX_HW_API_config_t *hw_api_config) {
     /* To be implemented by the device manufacturer */
 #ifdef SIGFOX_EP_ERROR_CODES
-    LR11XX_HW_API_status_t status = LR11XX_HW_API_SUCCESS;
+    LR11XX_HW_API_status_t status = LR11XX_HW_API_ERROR;
 #endif
     SIGFOX_UNUSED(hw_api_config);
     SIGFOX_RETURN();
@@ -56,7 +56,7 @@ LR11XX_HW_API_status_t __attribute__((weak)) LR11XX_HW_API_open(LR11XX_HW_API_co
 LR11XX_HW_API_status_t __attribute__((weak)) LR11XX_HW_API_close(void) {
     /* To be implemented by the device manufacturer */
 #ifdef SIGFOX_EP_ERROR_CODES
-    LR11XX_HW_API_status_t status = LR11XX_HW_API_SUCCESS;
+    LR11XX_HW_API_status_t status = LR11XX_HW_API_ERROR;
 #endif
     SIGFOX_RETURN();
 }
@@ -64,7 +64,7 @@ LR11XX_HW_API_status_t __attribute__((weak)) LR11XX_HW_API_close(void) {
 LR11XX_HW_API_status_t __attribute__((weak)) LR11XX_HW_API_delayMs(unsigned short delay_ms) {
     /* To be implemented by the device manufacturer */
 #ifdef SIGFOX_EP_ERROR_CODES
-    LR11XX_HW_API_status_t status = LR11XX_HW_API_SUCCESS;
+    LR11XX_HW_API_status_t status = LR11XX_HW_API_ERROR;
 #endif
     SIGFOX_UNUSED(delay_ms);
     SIGFOX_RETURN();
@@ -73,7 +73,7 @@ LR11XX_HW_API_status_t __attribute__((weak)) LR11XX_HW_API_delayMs(unsigned shor
 LR11XX_HW_API_status_t __attribute__((weak)) LR11XX_HW_API_get_fem_mask(LR11XX_HW_API_FEM_t fem, sfx_u8 *rfsw_dio_mask) {
     /* To be implemented by the device manufacturer */
 #ifdef SIGFOX_EP_ERROR_CODES
-    LR11XX_HW_API_status_t status = LR11XX_HW_API_SUCCESS;
+    LR11XX_HW_API_status_t status = LR11XX_HW_API_ERROR;
 #endif
     SIGFOX_UNUSED(fem);
     SIGFOX_UNUSED(rfsw_dio_mask);
@@ -83,7 +83,7 @@ LR11XX_HW_API_status_t __attribute__((weak)) LR11XX_HW_API_get_fem_mask(LR11XX_H
 LR11XX_HW_API_status_t __attribute__((weak)) LR11XX_HW_API_get_xosc_cfg(LR11XX_HW_API_xosc_cfg_t *xosc_cfg) {
     /* To be implemented by the device manufacturer */
 #ifdef SIGFOX_EP_ERROR_CODES
-    LR11XX_HW_API_status_t status = LR11XX_HW_API_SUCCESS;
+    LR11XX_HW_API_status_t status = LR11XX_HW_API_ERROR;
 #endif
     SIGFOX_UNUSED(xosc_cfg);
     SIGFOX_RETURN();
@@ -92,7 +92,7 @@ LR11XX_HW_API_status_t __attribute__((weak)) LR11XX_HW_API_get_xosc_cfg(LR11XX_H
 LR11XX_HW_API_status_t __attribute__((weak)) LR11XX_HW_API_get_pa_pwr_cfg(LR11XX_HW_API_pa_pwr_cfg_t *pa_pwr_cfg, sfx_u32 rf_freq_in_hz, sfx_s8 expected_output_pwr_in_dbm) {
     /* To be implemented by the device manufacturer */
 #ifdef SIGFOX_EP_ERROR_CODES
-    LR11XX_HW_API_status_t status = LR11XX_HW_API_SUCCESS;
+    LR11XX_HW_API_status_t status = LR11XX_HW_API_ERROR;
 #endif
     SIGFOX_UNUSED(pa_pwr_cfg);
     SIGFOX_UNUSED(rf_freq_in_hz);
@@ -103,7 +103,7 @@ LR11XX_HW_API_status_t __attribute__((weak)) LR11XX_HW_API_get_pa_pwr_cfg(LR11XX
 LR11XX_HW_API_status_t __attribute__((weak)) LR11XX_HW_API_tx_on(void) {
     /* To be implemented by the device manufacturer */
 #ifdef SIGFOX_EP_ERROR_CODES
-    LR11XX_HW_API_status_t status = LR11XX_HW_API_SUCCESS;
+    LR11XX_HW_API_status_t status = LR11XX_HW_API_ERROR;
 #endif
     SIGFOX_RETURN();
 }
@@ -111,7 +111,7 @@ LR11XX_HW_API_status_t __attribute__((weak)) LR11XX_HW_API_tx_on(void) {
 LR11XX_HW_API_status_t __attribute__((weak)) LR11XX_HW_API_tx_off(void) {
     /* To be implemented by the device manufacturer */
 #ifdef SIGFOX_EP_ERROR_CODES
-    LR11XX_HW_API_status_t status = LR11XX_HW_API_SUCCESS;
+    LR11XX_HW_API_status_t status = LR11XX_HW_API_ERROR;
 #endif
     SIGFOX_RETURN();
 }
@@ -119,7 +119,7 @@ LR11XX_HW_API_status_t __attribute__((weak)) LR11XX_HW_API_tx_off(void) {
 LR11XX_HW_API_status_t __attribute__((weak)) LR11XX_HW_API_rx_on(void) {
     /* To be implemented by the device manufacturer */
 #ifdef SIGFOX_EP_ERROR_CODES
-    LR11XX_HW_API_status_t status = LR11XX_HW_API_SUCCESS;
+    LR11XX_HW_API_status_t status = LR11XX_HW_API_ERROR;
 #endif
     SIGFOX_RETURN();
 }
@@ -127,7 +127,7 @@ LR11XX_HW_API_status_t __attribute__((weak)) LR11XX_HW_API_rx_on(void) {
 LR11XX_HW_API_status_t __attribute__((weak)) LR11XX_HW_API_rx_off(void) {
     /* To be implemented by the device manufacturer */
 #ifdef SIGFOX_EP_ERROR_CODES
-    LR11XX_HW_API_status_t status = LR11XX_HW_API_SUCCESS;
+    LR11XX_HW_API_status_t status = LR11XX_HW_API_ERROR;
 #endif
     SIGFOX_RETURN();
 }
@@ -137,7 +137,7 @@ LR11XX_HW_API_status_t __attribute__((weak)) LR11XX_HW_API_rx_off(void) {
 LR11XX_HW_API_status_t __attribute__((weak)) LR11XX_HW_API_get_latency(LR11XX_HW_API_latency_t latency_type, sfx_u32 *latency_ms) {
     /* To be implemented by the device manufacturer */
 #ifdef SIGFOX_EP_ERROR_CODES
-    LR11XX_HW_API_status_t status = LR11XX_HW_API_SUCCESS;
+    LR11XX_HW_API_status_t status = LR11XX_HW_API_ERROR;
 #endif
     SIGFOX_UNUSED(latency_type);
     SIGFOX_UNUSED(latency_ms);

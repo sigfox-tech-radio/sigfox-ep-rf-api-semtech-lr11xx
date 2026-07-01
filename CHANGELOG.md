@@ -7,6 +7,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [v3.1](https://github.com/sigfox-tech-radio/sigfox-ep-rf-api-semtech-lr11xx/releases/tag/v3.1) - 01 Jul 2026
+
+### Fixed
+
+* Remove **extra warnings**.
+
+### Changed
+
+* Upgrade to **LR11xx driver v3.0.0**.
+* Return **error by default** in weak functions template.
+
+### Known limitations
+
+* **LBT** not implemented.
+
 ## [v3.0](https://github.com/sigfox-tech-radio/sigfox-ep-rf-api-semtech-lr11xx/releases/tag/v3.0) - 22 Nov 2024
 
 ### Changed
@@ -19,7 +34,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Known limitations
 
-* **LBT** not implemented
+* **LBT** not implemented.
 
 ## [v2.1](https://github.com/sigfox-tech-radio/sigfox-ep-rf-api-semtech-lr11xx/releases/tag/v2.1) - 30 May 2024
 
@@ -37,6 +52,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 * Remove lr11xx_hw_api.c from **LR11XX_RF_API_SOURCES** in `CMakeLists.txt`.
 
+### Known limitations
+
+* **LBT** not implemented.
+
 ## [v2.0](https://github.com/sigfox-tech-radio/sigfox-ep-rf-api-semtech-lr11xx/releases/tag/v2.0) - 22 Mar 2024
 
 ### Changed
@@ -53,6 +72,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 * New methods in **LR11XX_HW_API** to configure output power board oscillator.
+
+### Known limitations
+
+* **LBT** not implemented.
 
 ## [v1.2](https://github.com/sigfox-tech-radio/sigfox-ep-rf-api-semtech-lr11xx/releases/tag/v1.2) - 09 Nov 2023
 

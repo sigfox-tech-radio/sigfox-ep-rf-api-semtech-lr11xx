@@ -70,7 +70,7 @@ typedef void LR11XX_HW_API_status_t;
 
 /*!******************************************************************
  * \enum LR11XX_HW_API_FEM_t
- * \brief Front end module configuration strucure.
+ * \brief Front end module configuration structure.
  *******************************************************************/
 typedef enum {
     LR11XX_HW_API_FEM_PIN_USED = 1,
