@@ -11,6 +11,7 @@ The table below shows the versions compatibility between this radio example and 
 
 | **LR11XX_RF_API** | **EP_LIB** |
 |:---:|:---:|
+| [v3.2](https://github.com/sigfox-tech-radio/sigfox-ep-rf-api-semtech-lr11xx/releases/tag/v3.2) | >= [v4.0](https://github.com/sigfox-tech-radio/sigfox-ep-lib/releases/tag/v4.0) |
 | [v3.1](https://github.com/sigfox-tech-radio/sigfox-ep-rf-api-semtech-lr11xx/releases/tag/v3.1) | >= [v4.0](https://github.com/sigfox-tech-radio/sigfox-ep-lib/releases/tag/v4.0) |
 | [v3.0](https://github.com/sigfox-tech-radio/sigfox-ep-rf-api-semtech-lr11xx/releases/tag/v3.0) | >= [v4.0](https://github.com/sigfox-tech-radio/sigfox-ep-lib/releases/tag/v4.0) |
 | [v2.1](https://github.com/sigfox-tech-radio/sigfox-ep-rf-api-semtech-lr11xx/releases/tag/v2.1) | [v3.6](https://github.com/sigfox-tech-radio/sigfox-ep-lib/releases/tag/v3.6) |
@@ -44,7 +45,7 @@ The templates are located in the `src/board` folder.
 
 ### Submodule
 
-The best way to embed the LR11XX RF API example into your project is to use a [Git submodule](https://git-scm.com/book/en/v2/Git-Tools-Submodules), in a similar way to the library. The radio driver will be seen as a sub-repository with independant history. It will be much easier to **upgrade the radio driver** or to **switch between versions** when necessary, by using the common `git pull` and `git checkout` commands within the `sigfox-ep-rf-api-st-s2lp` folder.
+The best way to embed the LR11XX RF API example into your project is to use a [Git submodule](https://git-scm.com/book/en/v2/Git-Tools-Submodules), in a similar way to the library. The radio driver will be seen as a sub-repository with independant history. It will be much easier to **upgrade the radio driver** or to **switch between versions** when necessary, by using the common `git pull` and `git checkout` commands within the `sigfox-ep-rf-api-semtech-lr11xx` folder.
 
 To add the LR11XX RF API submodule, go to your project location and run the following commands:
 

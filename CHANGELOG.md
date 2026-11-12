@@ -7,6 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [v3.2](https://github.com/sigfox-tech-radio/sigfox-ep-rf-api-semtech-lr11xx/releases/tag/v3.2) - 12 Nov 2026
+
+### Added
+
+* Add **version file**.
+
+### Changed
+
+* Changed from the Clear BSD License to the standard **BSD 3-Clause License**. See the `LICENSE` file for details.
+
+### Known limitations
+
+* **LBT** not implemented.
+
 ## [v3.1](https://github.com/sigfox-tech-radio/sigfox-ep-rf-api-semtech-lr11xx/releases/tag/v3.1) - 01 Jul 2026
 
 ### Fixed
